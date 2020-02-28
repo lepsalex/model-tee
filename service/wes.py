@@ -1,11 +1,12 @@
 import json
 import requests
-from urllib import request
 import aiohttp
 import asyncio
+import pandas as pd
+from urllib import request
 
-WES_BASE = "http://wes.flow.infra.icgc-argo.org/api/v1/runs/"
-MIN_MEM = 20
+WES_BASE = "https://wes.rdpc.cancercollaboratory.org/api/v1/runs/"
+MIN_PROCESS_MEM = 20
 
 
 def getWesRuns(wesIds):
@@ -13,13 +14,17 @@ def getWesRuns(wesIds):
     coroutines = [getWesRun(wesId) for wesId in wesIds]
     return loop.run_until_complete(asyncio.gather(*coroutines))
 
+def getRunsAsDataframe(wesIds):
+    runs = getWesRuns(wesIds)
+    return pd.DataFrame(runs)
 
 async def getWesRun(wesId):
     async with aiohttp.ClientSession() as session:
         async with session.get("{}{}".format(WES_BASE, wesId.strip())) as response:
             data = await response.json()
             return {
-                "runId": data["run_id"],
+                "run_id": data["run_id"],
+                "state": data["state"],
                 "params": data["request"]["workflow_params"],
                 "start": data["run_log"]["start_time"],
                 "end": data["run_log"]["end_time"],
@@ -48,7 +53,7 @@ async def startVariableParamsRun(params, api_token, score_api_token, semaphore =
     async with semaphore:
         async with aiohttp.ClientSession() as session:
             cpus = params["cpus"]
-            mem = max((params["cpus"] * 3) + 2, MIN_MEM)
+            mem = max((params["cpus"] * 3) + 2, MIN_PROCESS_MEM)
             nfs = params["nfs"]
             analysisId = params["analysisId"]
 
