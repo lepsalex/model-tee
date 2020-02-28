@@ -14,10 +14,11 @@ sheet = Sheet(SPREADSHEET_ID)
 sheet_data = sheet.read(RANGE)
 
 # Update job status
-# sheet_data = updateSheetWithLatest(sheet_data)
+sheet_data = updateSheetWithLatest(sheet_data)
+print(sheet_data)
 
-# Start jobs if possible
-startJobsOnEmptyNFS(sheet_data)
+# # Start jobs if possible
+# startJobsOnEmptyNFS(sheet_data)
 
 # Update again
 

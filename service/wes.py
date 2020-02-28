@@ -16,22 +16,31 @@ def getWesRuns(wesIds):
 
 def getRunsAsDataframe(wesIds):
     runs = getWesRuns(wesIds)
+    runs = [run for run in runs if run] # TODO remove this step in prod, it is here because some runs do not have analysis id
     return pd.DataFrame(runs)
 
 async def getWesRun(wesId):
     async with aiohttp.ClientSession() as session:
         async with session.get("{}{}".format(WES_BASE, wesId.strip())) as response:
-            data = await response.json()
-            return {
-                "run_id": data["run_id"],
-                "state": data["state"],
-                "params": data["request"]["workflow_params"],
-                "start": data["run_log"]["start_time"],
-                "end": data["run_log"]["end_time"],
-                "duration": data["run_log"]["duration"],
-                "tasks": list(filter(None, map(processTasks, data["task_logs"])))
-            }
+            # TODO remove this try.except in prod, it is here because some runs do not have analysis id
+            try:
+                data = await response.json()
+                return {
+                    "analysis_id": data["request"]["workflow_params"]["analysis_id"],
+                    "run_id": data["run_id"],
+                    "state": data["state"],
+                    "params": data["request"]["workflow_params"],
+                    "start": data["run_log"]["start_time"],
+                    "end": data["run_log"]["end_time"],
+                    "duration": data["run_log"]["duration"],
+                    "tasks": list(filter(None, map(processTasks, data["task_logs"])))
+                }
+            except Exception:
+                pass
 
+def getWesRunIds():
+    data = requests.get(WES_BASE).json()
+    return [run["run_id"] for run in data["runs"]]
 
 def startWesRuns(paramsList, tokenFile="api_token", scoreTokenFile="score_api_token"):
     # Get tokens from files
