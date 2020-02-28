@@ -48,19 +48,19 @@ def startWesRuns(paramsList, tokenFile="api_token", scoreTokenFile="score_api_to
     return loop.run_until_complete(asyncio.gather(*coroutines))
 
 
-# currently running Semaphore at 1 due to wes api start runs not able to handle more
-async def startVariableParamsRun(params, api_token, score_api_token, semaphore = asyncio.Semaphore(1)):
+async def startVariableParamsRun(params, api_token, score_api_token, semaphore = asyncio.Semaphore(5)):
     async with semaphore:
         async with aiohttp.ClientSession() as session:
             cpus = params["cpus"]
             mem = max((params["cpus"] * 3) + 2, MIN_PROCESS_MEM)
             nfs = params["nfs"]
             analysisId = params["analysisId"]
+            studyId = params["studyId"]
 
             payload = {
                 "workflow_url": "icgc-argo/nextflow-dna-seq-alignment",
                 "workflow_params": {
-                    "study_id": "PANCHOPE-CA",
+                    "study_id": studyId,
                     "analysis_id": analysisId,
                     "song_url": "https://song.qa.argo.cancercollaboratory.org",
                     "score_url": "https://score.qa.argo.cancercollaboratory.org",
