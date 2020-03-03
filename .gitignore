@@ -3,6 +3,7 @@ credentials.json
 token.pickle
 api_token
 score_api_token
+static
 .vscode
 
 # Byte-compiled / optimized / DLL files

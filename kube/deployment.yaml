@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: model-tee
+spec:
+  selector:
+    matchLabels:
+      app: model-tee # has to match .spec.template.metadata.labels
+  serviceName: "model-tee"
+  replicas: 1 # by default is 1
+  template:
+    metadata:
+      labels:
+        app: model-tee # has to match .spec.selector.matchLabels
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: model-tee
+          image: lepsalex/model-tee:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: model-tee-app
+              mountPath: /usr/src/app/static
+  volumeClaimTemplates:
+    - metadata:
+        name: model-tee-app
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: "standard"
+        resources:
+          requests:
+            storage: 1Gi

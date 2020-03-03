@@ -1,5 +1,6 @@
 import pickle
-import os.path
+import os
+import json
 import pandas as pd
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -10,17 +11,18 @@ class Sheet:
 
     # If modifying these scopes, delete the file token.pickle.
     SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+    STORAGE_ROOT = os.getenv("STORAGE_ROOT", './static')
 
     def __init__(self, spreadsheet_id):
-        """Shows basic usage of the Sheets API.
-        Prints values from a sample spreadsheet.
-        """
-        creds = None
+        # Create credentials.json file
+        self.createCredentialsFile()
+
         # The file token.pickle stores the user"s access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
         # time.
-        if os.path.exists("token.pickle"):
-            with open("token.pickle", "rb") as token:
+        creds = None
+        if os.path.exists("{}/token.pickle".format(self.STORAGE_ROOT)):
+            with open("{}/token.pickle".format(self.STORAGE_ROOT), "rb") as token:
                 creds = pickle.load(token)
         # If there are no (valid) credentials available, let the user log in.
         if not creds or not creds.valid:
@@ -28,10 +30,10 @@ class Sheet:
                 creds.refresh(Request())
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(
-                    "credentials.json", self.SCOPES)
+                    "{}/credentials.json".format(self.STORAGE_ROOT), self.SCOPES)
                 creds = flow.run_local_server(port=0)
             # Save the credentials for the next run
-            with open("token.pickle", "wb") as token:
+            with open("{}/token.pickle".format(self.STORAGE_ROOT), "wb") as token:
                 pickle.dump(creds, token)
 
         service = build("sheets", "v4", credentials=creds)
@@ -90,3 +92,19 @@ class Sheet:
                 data.append(ds)
             df = pd.concat(data, axis=1)
             return df
+
+    def createCredentialsFile(self):
+        with open("{}/credentials.json".format(self.STORAGE_ROOT), "w") as fp:
+            creds = {
+                "installed": {
+                    "client_id": os.getenv("GOOGLE_CLIENT_ID", "CLIENT-ID-REQUIRED"),
+                    "client_secret": os.getenv("GOOGLE_CLIENT_SECRET", "CLIENT-SECRET-REQUIRED"),
+                    "project_id": os.getenv("GOOGLE_PROJECT_ID", "wes-estimator-sandbox"),
+                    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                    "token_uri": "https://oauth2.googleapis.com/token",
+                    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+                    "redirect_uris": ["urn:ietf:wg:oauth:2.0:oob", "http://localhost"]
+                }
+            }
+
+            json.dump(creds, fp)

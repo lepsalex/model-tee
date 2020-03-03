@@ -1,3 +1,4 @@
+import os
 import json
 import requests
 import aiohttp
@@ -7,6 +8,7 @@ from urllib import request
 
 WES_BASE = "https://wes.rdpc.cancercollaboratory.org/api/v1/runs/"
 MIN_PROCESS_MEM = 20
+STORAGE_ROOT = os.getenv("STORAGE_ROOT", './static')
 
 
 def getWesRuns(wesIds):
@@ -49,11 +51,11 @@ def getWesRunIds():
 
 def startWesRuns(paramsList, tokenFile="api_token", scoreTokenFile="score_api_token"):
     # Get tokens from files
-    token_f = open(tokenFile, 'r')
+    token_f = open("{}/{}".format(STORAGE_ROOT, tokenFile), 'r')
     api_token = token_f.readline().strip()
     token_f.close()
 
-    score_token_f = open(scoreTokenFile, 'r')
+    score_token_f = open("{}/{}".format(STORAGE_ROOT, scoreTokenFile), 'r')
     score_api_token = score_token_f.readline().strip()
     score_token_f.close()
 
