@@ -5,7 +5,7 @@ from service.tee import updateSheetWithLatest, startJobsOnEmptyNFS
 SPREADSHEET_ID = "13uxLJEjv5m6Q4nNOAsgeIKs8gm2rMctBK2CDXL5c4lU"
 
 # RANGES
-RANGE = "Sheet1"
+RANGE = "Dev"
 
 # Init Spreadsheet
 sheet = Sheet(SPREADSHEET_ID)
@@ -15,10 +15,9 @@ sheet_data = sheet.read(RANGE)
 
 # Update job status
 sheet_data = updateSheetWithLatest(sheet_data)
-print(sheet_data)
 
 # # Start jobs if possible
-# startJobsOnEmptyNFS(sheet_data)
+startJobsOnEmptyNFS(sheet_data)
 
 # Update again
 

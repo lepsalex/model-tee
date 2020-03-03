@@ -15,7 +15,7 @@ def updateSheetWithLatest(sheet_data):
 
     # Update sheet
     sheet_data = pd.merge(
-        sheet_data, latest_data[['analysis_id', 'run_id', 'state']], on='analysis_id', how="inner")
+        sheet_data, latest_data[['analysis_id', 'run_id', 'state']], on='analysis_id', how="left")
     sheet_data['run_id'] = sheet_data['run_id_y'].fillna(sheet_data['run_id_x'])
     sheet_data['state'] = sheet_data['state_y'].fillna(sheet_data['state_x'])
 
@@ -35,3 +35,4 @@ def startJobsOnEmptyNFS(sheet_data):
     next_runs = eligible_analyses.groupby("work_dir").first()
 
     # TODO: build run params
+    print(next_runs)
