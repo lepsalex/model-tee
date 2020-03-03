@@ -1,0 +1,7 @@
+.vscode
+.git
+.gitignore
+credentials.json
+token.pickle
+api_token
+score_api_token
