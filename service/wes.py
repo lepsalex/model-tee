@@ -14,10 +14,13 @@ def getWesRuns(wesIds):
     coroutines = [getWesRun(wesId) for wesId in wesIds]
     return loop.run_until_complete(asyncio.gather(*coroutines))
 
+
 def getRunsAsDataframe(wesIds):
     runs = getWesRuns(wesIds)
-    runs = [run for run in runs if run] # TODO remove this step in prod, it is here because some runs do not have analysis id
+    # TODO remove this step in prod, it is here because some runs do not have analysis id
+    runs = [run for run in runs if run]
     return pd.DataFrame(runs)
+
 
 async def getWesRun(wesId):
     async with aiohttp.ClientSession() as session:
@@ -38,9 +41,11 @@ async def getWesRun(wesId):
             except Exception:
                 pass
 
+
 def getWesRunIds():
     data = requests.get(WES_BASE).json()
     return [run["run_id"] for run in data["runs"]]
+
 
 def startWesRuns(paramsList, tokenFile="api_token", scoreTokenFile="score_api_token"):
     # Get tokens from files
@@ -53,13 +58,16 @@ def startWesRuns(paramsList, tokenFile="api_token", scoreTokenFile="score_api_to
     score_token_f.close()
 
     loop = asyncio.get_event_loop()
-    coroutines = [startVariableParamsRun(params, api_token, score_api_token) for params in paramsList]
+    coroutines = [startVariableParamsRun(
+        params, api_token, score_api_token) for params in paramsList]
     return loop.run_until_complete(asyncio.gather(*coroutines))
 
 
-async def startVariableParamsRun(params, api_token, score_api_token, semaphore = asyncio.Semaphore(5)):
+async def startVariableParamsRun(params, api_token, score_api_token, semaphore=asyncio.Semaphore(5)):
     async with semaphore:
         async with aiohttp.ClientSession() as session:
+            print("Starting new job for analysisId: ", params["analysisId"])
+
             cpus = params["cpus"]
             mem = max((params["cpus"] * 3) + 2, MIN_PROCESS_MEM)
             nfs = params["nfs"]
@@ -67,47 +75,70 @@ async def startVariableParamsRun(params, api_token, score_api_token, semaphore =
             studyId = params["studyId"]
 
             payload = {
-                "workflow_url": "icgc-argo/nextflow-dna-seq-alignment",
+                "workflow_url": "icgc-argo/dna-seq-processing-wfs",
                 "workflow_params": {
                     "study_id": studyId,
                     "analysis_id": analysisId,
                     "song_url": "https://song.qa.argo.cancercollaboratory.org",
                     "score_url": "https://score.qa.argo.cancercollaboratory.org",
                     "api_token": api_token,
-                    "reference_dir": "/{}/reference/GRCh38_hla_decoy_ebv".format(nfs),
-                    "aligned_lane_prefix": "grch38-aligned",
-                    "aligned_basename": "wgs.grch38",
+                    "ref_genome_fa": "/{}/reference/GRCh38_hla_decoy_ebv/GRCh38_hla_decoy_ebv.fa".format(nfs),
+                    "cpus": 2,
+                    "mem": 4,
                     "download": {
-                        "song_url": "https://intermediate-song.qa.argo.cancercollaboratory.org",
+                        # "song_url": "https://intermediate-song.qa.argo.cancercollaboratory.org",
                         "song_cpus": 2,
                         "song_mem": 2,
-                        "score_url": "https://storage.cancercollaboratory.org",
-                        "score_api_token": score_api_token,
+                        # "score_url": "https://storage.cancercollaboratory.org",
+                        # "score_api_token": score_api_token,
                         "score_cpus": 8,
                         "score_mem": 18
                     },
-                    "seqtolanebam": {
+                    "seqDataToLaneBam": {
                         "cpus": cpus,
                         "mem": mem
                     },
-                    "align": {
+                    "bwaMemAligner": {
                         "cpus": cpus,
                         "mem": mem
                     },
-                    "merge": {
-                        "cpus": 4,
+                    "bamMergeSortMarkdup": {
+                         "cpus": 4,
                         "mem": 18
                     },
-                    "sequencing_alignment_payload_gen": {
+                    "payloadGenDnaAlignment": {
+                        "cpus": 2,
+                        "mem": 4
+                    },
+                    "readGroupUBamQC": {
+                        "cpus": 3,
+                        "mem": 6
+                    },
+                    "alignedSeqQC": {
+                        "cpus": 4,
+                        "mem": 10
+                    },
+                    "gatkCollectOxogMetrics": {
+                        "cpus": 3,
+                        "mem": 6
+                    },
+                    "payloadGenDnaSeqQc": {
                         "cpus": 2,
                         "mem": 2
                     },
-                    "upload": {
+                    "uploadAlignment": {
                         "song_cpus": 2,
                         "song_mem": 2,
                         "score_cpus": 8,
                         "score_mem": 18
-                    }
+                    },
+                    "uploadQc": {
+                        "song_cpus": 2,
+                        "song_mem": 2,
+                        "score_cpus": 2,
+                        "score_mem": 4
+                    },
+                    "cleanup": True
                 },
                 "workflow_engine_params": {
                     "work_dir": "/{}/work".format(nfs)
