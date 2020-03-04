@@ -14,11 +14,12 @@ RANGE = os.getenv("GOOGLE_SHEET_RANGE", "Dev")
 # Settings
 INTERVAL = int(os.getenv("RUN_INTERVAL_SECONDS", 60))
 
-def model_tee():
-    print("Getting sheet ...")
-    # Init Spreadsheet
-    sheet = Sheet(SPREADSHEET_ID)
+print("Getting sheet ...")
+# Init Spreadsheet
+sheet = Sheet(SPREADSHEET_ID)
 
+
+def model_tee():
     # Read Google Sheet into Dataframe
     sheet_data = sheet.read(RANGE)
 

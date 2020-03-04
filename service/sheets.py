@@ -3,41 +3,26 @@ import os
 import json
 import pandas as pd
 from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
+from google.oauth2 import service_account
 
 
 class Sheet:
 
-    # If modifying these scopes, delete the file token.pickle.
     SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+    AUTH_REDIRECT_URL = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost")
     STORAGE_ROOT = os.getenv("STORAGE_ROOT", './static')
 
     def __init__(self, spreadsheet_id):
-        # Create credentials.json file
-        self.createCredentialsFile()
+        # Create credentials.json file (if not there)
+        creds_fp = "{}/credentials.json".format(self.STORAGE_ROOT)
+        if not os.path.exists(creds_fp):
+            self.createCredentialsFile(creds_fp)
 
-        # The file token.pickle stores the user"s access and refresh tokens, and is
-        # created automatically when the authorization flow completes for the first
-        # time.
-        creds = None
-        if os.path.exists("{}/token.pickle".format(self.STORAGE_ROOT)):
-            with open("{}/token.pickle".format(self.STORAGE_ROOT), "rb") as token:
-                creds = pickle.load(token)
-        # If there are no (valid) credentials available, let the user log in.
-        if not creds or not creds.valid:
-            if creds and creds.expired and creds.refresh_token:
-                creds.refresh(Request())
-            else:
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    "{}/credentials.json".format(self.STORAGE_ROOT), self.SCOPES)
-                creds = flow.run_local_server(host=os.getenv("GOOGLE_AUTH_FLOW_HOST", "localhost"), port=int(os.getenv("GOOGLE_AUTH_FLOW_PORT", 8080)))
-            # Save the credentials for the next run
-            with open("{}/token.pickle".format(self.STORAGE_ROOT), "wb") as token:
-                pickle.dump(creds, token)
+        # build creds from service account json (generated above)
+        creds = service_account.Credentials.from_service_account_file(creds_fp, scopes=self.SCOPES)
 
+        # build service
         service = build("sheets", "v4", credentials=creds)
-
         self.sheet = service.spreadsheets()
         self.spreadsheet_id = spreadsheet_id
 
@@ -93,18 +78,19 @@ class Sheet:
             df = pd.concat(data, axis=1)
             return df
 
-    def createCredentialsFile(self):
-        with open("{}/credentials.json".format(self.STORAGE_ROOT), "w") as fp:
+    def createCredentialsFile(self, path):
+        with open(path, "w") as fp:
             creds = {
-                "installed": {
-                    "client_id": os.getenv("GOOGLE_CLIENT_ID", "CLIENT-ID-REQUIRED"),
-                    "client_secret": os.getenv("GOOGLE_CLIENT_SECRET", "CLIENT-SECRET-REQUIRED"),
-                    "project_id": os.getenv("GOOGLE_PROJECT_ID", "wes-estimator-sandbox"),
-                    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                    "token_uri": "https://oauth2.googleapis.com/token",
-                    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-                    "redirect_uris": os.getenv("GOOGLE_REDIRECT_URIS", "http://localhost").split(" ")
-                }
+                "type": "service_account",
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+                "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+                "project_id": os.getenv("GOOGLE_PROJECT_ID"),
+                "private_key_id": os.getenv("GOOGLE_PRIVATE_KEY_ID"),
+                "private_key": os.getenv("GOOGLE_PRIVATE_KEY"),
+                "client_email": os.getenv("GOOGLE_CLIENT_EMAIL"),
+                "client_id": os.getenv("GOOGLE_CLIENT_ID"),
+                "client_x509_cert_url": os.getenv("GOOGLE_CLIENT_X509_CERT_URL")
             }
 
             json.dump(creds, fp)

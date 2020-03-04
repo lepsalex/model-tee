@@ -21,6 +21,10 @@ spec:
       containers:
         - name: model-tee
           image: lepsalex/model-tee:latest
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
           imagePullPolicy: Always
           volumeMounts:
             - name: model-tee-app
@@ -51,13 +55,13 @@ metadata:
   labels:
     app.kubernetes.io/name: model-tee
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     statefulset.kubernetes.io/pod-name: model-tee-0
   ports:
     - protocol: TCP
-      port: 8080
-      targetPort: 8080
+      port: 80
+      targetPort: http
 ---
 #INGRESS
 apiVersion: extensions/v1beta1
@@ -80,4 +84,4 @@ spec:
           - path: /
             backend:
               serviceName: model-tee
-              servicePort: 8080
+              servicePort: 80
