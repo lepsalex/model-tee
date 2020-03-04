@@ -9,10 +9,10 @@ load_dotenv()
 
 # The ID and range of the spreadsheet.
 SPREADSHEET_ID = "13uxLJEjv5m6Q4nNOAsgeIKs8gm2rMctBK2CDXL5c4lU"
-
-# RANGES
 RANGE = os.getenv("GOOGLE_SHEET_RANGE", "Dev")
 
+# Settings
+INTERVAL = int(os.getenv("RUN_INTERVAL_SECONDS", 60))
 
 def model_tee():
     print("Getting sheet ...")
@@ -50,8 +50,8 @@ while True:
         print("Error! Restarting ... \n\n", ex)
         model_tee()
 
-    print("Sleep for 60 ...")
-    for x in reversed(range(60)):
+    print("Sleep for {} ...".format(INTERVAL))
+    for x in reversed(range(INTERVAL)):
         if x >= 10:
             if x % 10 == 0:
                 print(".........", x)
