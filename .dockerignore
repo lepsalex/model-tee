@@ -7,3 +7,12 @@ token.pickle
 api_token
 score_api_token
 kube
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/

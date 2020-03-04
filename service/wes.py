@@ -8,7 +8,7 @@ from urllib import request
 
 WES_BASE = "https://wes.rdpc.cancercollaboratory.org/api/v1/runs/"
 MIN_PROCESS_MEM = 20
-STORAGE_ROOT = os.getenv("STORAGE_ROOT", './static')
+STORAGE_ROOT = os.getenv("STORAGE_ROOT", "./static")
 
 
 def getWesRuns(wesIds):
@@ -49,23 +49,18 @@ def getWesRunIds():
     return [run["run_id"] for run in data["runs"]]
 
 
-def startWesRuns(paramsList, tokenFile="api_token", scoreTokenFile="score_api_token"):
-    # Get tokens from files
-    token_f = open("{}/{}".format(STORAGE_ROOT, tokenFile), 'r')
-    api_token = token_f.readline().strip()
-    token_f.close()
-
-    score_token_f = open("{}/{}".format(STORAGE_ROOT, scoreTokenFile), 'r')
-    score_api_token = score_token_f.readline().strip()
-    score_token_f.close()
+def startWesRuns(paramsList):
+    # Get tokens from env
+    API_TOKEN = os.getenv("SONG_API_TOKEN")
+    ICGC_SCORE_TOKEN = os.getenv("ICGC_SCORE_API_TOKEN") # icgc-dcc
 
     loop = asyncio.get_event_loop()
     coroutines = [startVariableParamsRun(
-        params, api_token, score_api_token) for params in paramsList]
+        params, API_TOKEN, ICGC_SCORE_TOKEN) for params in paramsList]
     return loop.run_until_complete(asyncio.gather(*coroutines))
 
 
-async def startVariableParamsRun(params, api_token, score_api_token, semaphore=asyncio.Semaphore(5)):
+async def startVariableParamsRun(params, api_token, icgc_score_token, semaphore=asyncio.Semaphore(5)):
     async with semaphore:
         async with aiohttp.ClientSession() as session:
             print("Starting new job for analysisId: ", params["analysisId"])
