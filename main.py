@@ -1,3 +1,4 @@
+import os
 from service.sheets import Sheet
 from service.tee import updateSheetWithLatest, startJobsOnEmptyNFS
 from time import sleep
@@ -10,7 +11,7 @@ load_dotenv()
 SPREADSHEET_ID = "13uxLJEjv5m6Q4nNOAsgeIKs8gm2rMctBK2CDXL5c4lU"
 
 # RANGES
-RANGE = "Dev"
+RANGE = os.getenv("GOOGLE_SHEET_RANGE", "Dev")
 
 
 def model_tee():
