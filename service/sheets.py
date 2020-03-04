@@ -31,7 +31,7 @@ class Sheet:
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(
                     "{}/credentials.json".format(self.STORAGE_ROOT), self.SCOPES)
-                creds = flow.run_local_server(host=os.getenv("GOOGLE_AUTH_FLOW_HOST", "localhost") ,port=int(os.getenv("GOOGLE_AUTH_FLOW_PORT", 8080)))
+                creds = flow.run_local_server(host=os.getenv("GOOGLE_AUTH_FLOW_HOST", "localhost"), port=int(os.getenv("GOOGLE_AUTH_FLOW_PORT", 8080)))
             # Save the credentials for the next run
             with open("{}/token.pickle".format(self.STORAGE_ROOT), "wb") as token:
                 pickle.dump(creds, token)
@@ -102,7 +102,8 @@ class Sheet:
                     "project_id": os.getenv("GOOGLE_PROJECT_ID", "wes-estimator-sandbox"),
                     "auth_uri": "https://accounts.google.com/o/oauth2/auth",
                     "token_uri": "https://oauth2.googleapis.com/token",
-                    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs"
+                    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+                    "redirect_uris": os.getenv("GOOGLE_REDIRECT_URIS", "http://localhost").split(" ")
                 }
             }
 
