@@ -1,12 +1,16 @@
+# first run from project root: kubectl create configmap model-tee-env-file --from-env-file=.env
+
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: model-tee
+  labels:
+    app.kubernetes.io/name: model-tee
 spec:
   selector:
     matchLabels:
       app: model-tee # has to match .spec.template.metadata.labels
-  serviceName: "model-tee"
+  serviceName: model-tee
   replicas: 1 # by default is 1
   template:
     metadata:
@@ -21,6 +25,14 @@ spec:
           volumeMounts:
             - name: model-tee-app
               mountPath: /usr/src/app/static
+          env:
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: PYTHONIOENCODING
+              value: "UTF-8"
+          envFrom:
+            - configMapRef:
+                name: model-tee-env-file
   volumeClaimTemplates:
     - metadata:
         name: model-tee-app
@@ -30,3 +42,42 @@ spec:
         resources:
           requests:
             storage: 1Gi
+---
+# SERVICE
+apiVersion: v1
+kind: Service
+metadata:
+  name: model-tee
+  labels:
+    app.kubernetes.io/name: model-tee
+spec:
+  type: LoadBalancer
+  selector:
+    statefulset.kubernetes.io/pod-name: model-tee-0
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+#INGRESS
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: model-tee
+  labels:
+    app.kubernetes.io/name: model-tee
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod-a
+spec:
+  tls:
+    - hosts:
+        - "modeltee.rdpc.cancercollaboratory.org"
+      secretName: model-tee-cert
+  rules:
+    - host: "modeltee.rdpc.cancercollaboratory.org"
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: model-tee
+              servicePort: http
