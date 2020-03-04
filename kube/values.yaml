@@ -56,7 +56,7 @@ spec:
     statefulset.kubernetes.io/pod-name: model-tee-0
   ports:
     - protocol: TCP
-      port: 80
+      port: 8080
       targetPort: 8080
 ---
 #INGRESS
@@ -80,4 +80,4 @@ spec:
           - path: /
             backend:
               serviceName: model-tee
-              servicePort: http
+              servicePort: 8080
