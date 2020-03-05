@@ -5,6 +5,7 @@ api_token
 score_api_token
 static
 .vscode
+google_private_key.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

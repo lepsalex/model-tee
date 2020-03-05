@@ -1,7 +1,8 @@
 .vscode
 .git
 .gitignore
-static
+static/**/*
+google_private_key.txt
 credentials.json
 token.pickle
 api_token

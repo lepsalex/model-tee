@@ -25,6 +25,8 @@ spec:
           volumeMounts:
             - name: model-tee-app
               mountPath: /usr/src/app/static
+            - name: model-tee-app-secret
+              mountPath: /usr/src/app/secret
           env:
             - name: PYTHONUNBUFFERED
               value: "1"
@@ -33,6 +35,10 @@ spec:
           envFrom:
             - configMapRef:
                 name: model-tee-env-file
+      volumes:
+        - name: model-tee-app-secret
+          secret:
+            secretName: model-tee-google-key
   volumeClaimTemplates:
     - metadata:
         name: model-tee-app
