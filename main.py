@@ -1,6 +1,6 @@
 import os
 from service.sheets import Sheet
-from service.tee import updateSheetWithLatest, startJobsOnEmptyNFS
+from service.tee import model_tee
 from time import sleep
 from dotenv import load_dotenv
 
@@ -8,8 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # The ID and range of the spreadsheet.
-SPREADSHEET_ID = "13uxLJEjv5m6Q4nNOAsgeIKs8gm2rMctBK2CDXL5c4lU"
-RANGE = os.getenv("GOOGLE_SHEET_RANGE", "Dev")
+SPREADSHEET_ID = os.getenv("GOOGLE_SHEET_ID", "13uxLJEjv5m6Q4nNOAsgeIKs8gm2rMctBK2CDXL5c4lU")
 
 # Settings
 INTERVAL = int(os.getenv("RUN_INTERVAL_SECONDS", 60))
@@ -18,38 +17,12 @@ print("Getting sheet ...")
 # Init Spreadsheet
 sheet = Sheet(SPREADSHEET_ID)
 
-
-def model_tee():
-    # Read Google Sheet into Dataframe
-    sheet_data = sheet.read(RANGE)
-
-    # Update job status
-    print("Updating sheet data with latest from Cargo ...")
-    sheet_data = updateSheetWithLatest(sheet_data)
-
-    # Start jobs if possible
-    print("Starting new jobs if NFS available ...")
-    startJobsOnEmptyNFS(sheet_data)
-
-    print("Sleep for 10 ...")
-    for x in reversed(range(10)):
-        print("."[0:1]*x, x)
-        sleep(1)
-
-    # Update again (after 10 second delay)
-    sheet_data = updateSheetWithLatest(sheet_data)
-
-    # Write sheet
-    print("Writing sheet data to Google Sheets ...")
-    sheet.write(RANGE, sheet_data)
-
-
 while True:
     try:
-        model_tee()
+        model_tee(sheet)
     except Exception as ex:
         print("Error! Restarting ... \n\n", ex)
-        model_tee()
+        model_tee(sheet)
 
     print("Sleep for {} ...".format(INTERVAL))
     for x in reversed(range(INTERVAL)):
