@@ -13,10 +13,8 @@ class Sheet:
     STORAGE_ROOT = os.getenv("STORAGE_ROOT", './static')
 
     def __init__(self, spreadsheet_id):
-        # Create credentials.json file (if not there)
-        creds_fp = "{}/credentials.json".format(self.STORAGE_ROOT)
-        if not os.path.exists(creds_fp):
-            self.createCredentialsFile(creds_fp)
+        # Create credentials.json file
+        creds_fp = self.createCredentialsFile("{}/credentials.json".format(self.STORAGE_ROOT))
 
         # build creds from service account json (generated above)
         creds = service_account.Credentials.from_service_account_file(creds_fp, scopes=self.SCOPES)
@@ -94,3 +92,5 @@ class Sheet:
             }
 
             json.dump(creds, fp)
+            
+            return path
