@@ -19,6 +19,7 @@ class Consumer(multiprocessing.Process):
     def run(self):
         print("Starting Kafka consumer ...")
         consumer = KafkaConsumer(client_id="model-tee",
+                                 group_id="model-tee-workflow-consumer",
                                  bootstrap_servers=BOOTSTRAP_SERVERS,
                                  value_deserializer=lambda m: json.loads(m.decode('utf-8')))
 
