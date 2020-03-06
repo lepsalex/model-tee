@@ -19,18 +19,15 @@ class Consumer(multiprocessing.Process):
     def run(self):
         print("Starting Kafka consumer ...")
         consumer = KafkaConsumer(client_id="model-tee",
-                                 group_id="model-tee-wf-complete-to-wes",
                                  bootstrap_servers=BOOTSTRAP_SERVERS,
-                                 auto_offset_reset="latest",
-                                 consumer_timeout_ms=1000,
                                  value_deserializer=lambda m: json.loads(m.decode('utf-8')))
 
         consumer.subscribe([TOPIC])
 
+        print(consumer.assignment())
+
         while not self.stop_event.is_set():
             for message in consumer:
-                print("test")
-                print(message)
                 self.onMessageFunc(message)
                 if self.stop_event.is_set():
                     break

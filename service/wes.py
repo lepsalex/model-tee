@@ -138,7 +138,8 @@ async def startVariableParamsRun(params, api_token, icgc_score_token, semaphore=
                     "cleanup": True
                 },
                 "workflow_engine_params": {
-                    "work_dir": "/{}/work".format(nfs)
+                    "work_dir": "/{}/work".format(nfs),
+                    "revision": "master"
                 }
             }
 

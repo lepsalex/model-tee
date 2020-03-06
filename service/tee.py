@@ -75,7 +75,9 @@ def startJobsOnEmptyNFS(sheet_data):
     # build run params
     params = [computeParams(next_run) for next_run in next_runs.values.tolist()]
 
-    startWesRuns(params)
+    newRuns = startWesRuns(params)
+
+    print("New runs started: ", newRuns[0])
 
 
 def computeParams(next_run):
