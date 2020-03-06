@@ -22,8 +22,22 @@ model_tee(sheet)
 # Message function to run on every message from Kafka on defined topic
 def onMessageFunc(message):
     print("Workflow event received ... applying filter ...")
-    if message["event"] == "completed":
-        print("Model T is go ...")
+    if message.value["event"] == "completed":
+        print("Model T roll out!\n")
+        print("\n\
+        ██──▀██▀▀▀██▀──██\n\
+        █▀█▄──▀█▄█▀──▄█▀█\n\
+        ██▄▀█▄──▀──▄█▀▄██\n\
+        █▄▀█▄█─█▄█─█▄█▀▄█\n\n\
+        ─▀█▄██─███─██▄█▀─\n\
+        █──────▐█▌──────█\n\
+        ██▌─▄█─███─█▄─▐██\n\
+        ██▌▐██─▀▀▀─██▌▐██\n\
+        ██▌▐█████████▌▐█▀\n\
+        ▀█▌▐██─▄▄▄─██▌▐█─\n\
+        ─▀──█▌▐███▌▐█──▀─\n\
+        ──────█████──────\n")
+
         model_tee(sheet)
     else:
         print("Event does not pass filter!")
