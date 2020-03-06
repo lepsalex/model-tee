@@ -1,34 +1,22 @@
 import os
 import json
-import multiprocessing
 from kafka import KafkaConsumer
 
 BOOTSTRAP_SERVERS = os.getenv("KAKFA_BOOTSTRAP_SERVERS", "localhost:9092")
 TOPIC = os.getenv("KAFKA_TOPIC", "workflow")
 
 
-class Consumer(multiprocessing.Process):
-    def __init__(self, onMessageFunc):
-        multiprocessing.Process.__init__(self)
-        self.stop_event = multiprocessing.Event()
-        self.onMessageFunc = onMessageFunc
+def consumeTopicWith(onMessageFunc):
+    print("Starting Kafka consumer ...")
+    consumer = KafkaConsumer(client_id="model-tee",
+                             group_id="model-tee-workflow-consumer",
+                             bootstrap_servers=BOOTSTRAP_SERVERS,
+                             value_deserializer=lambda m: json.loads(m.decode('utf-8')))
 
-    def stop(self):
-        self.stop_event.set()
+    consumer.subscribe([TOPIC])
 
-    def run(self):
-        print("Starting Kafka consumer ...")
-        consumer = KafkaConsumer(client_id="model-tee",
-                                 group_id="model-tee-workflow-consumer",
-                                 bootstrap_servers=BOOTSTRAP_SERVERS,
-                                 value_deserializer=lambda m: json.loads(m.decode('utf-8')))
+    for message in consumer:
+        onMessageFunc(message)
 
-        consumer.subscribe([TOPIC])
-
-        while not self.stop_event.is_set():
-            for message in consumer:
-                self.onMessageFunc(message)
-                if self.stop_event.is_set():
-                    break
-
+    if consumer is not None:
         consumer.close()

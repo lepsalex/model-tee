@@ -2,7 +2,7 @@ import os
 from kafka import KafkaConsumer
 from service.sheets import Sheet
 from service.tee import model_tee
-from service.kafka import Consumer
+from service.kafka import consumeTopicWith
 from time import sleep
 from dotenv import load_dotenv
 
@@ -20,10 +20,12 @@ sheet = Sheet(SPREADSHEET_ID)
 model_tee(sheet)
 
 # Message function to run on every message from Kafka on defined topic
+
+
 def onMessageFunc(message):
     print("Workflow event received ... applying filter ...")
     if message.value["event"] == "completed":
-        print("Model T roll out!\n")
+        print("\nModel T roll out!")
         print("\n\
         ██──▀██▀▀▀██▀──██\n\
         █▀█▄──▀█▄█▀──▄█▀█\n\
@@ -45,5 +47,4 @@ def onMessageFunc(message):
 
 # subscribe to workflow events and run on
 print("Waiting for workflow events ...")
-consumer_task = Consumer(onMessageFunc)
-consumer_task.start()
+consumeTopicWith(onMessageFunc)
