@@ -24,8 +24,6 @@ class Consumer(multiprocessing.Process):
 
         consumer.subscribe([TOPIC])
 
-        print(consumer.assignment())
-
         while not self.stop_event.is_set():
             for message in consumer:
                 self.onMessageFunc(message)

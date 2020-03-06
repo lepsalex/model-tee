@@ -8,6 +8,7 @@ token.pickle
 api_token
 score_api_token
 kube
+build.sh
 
 # Environments
 .env
