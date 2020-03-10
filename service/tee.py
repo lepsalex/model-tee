@@ -6,10 +6,7 @@ from service.wes import getWesRunIds, getRunsAsDataframe, startWesRuns
 RANGE = os.getenv("GOOGLE_SHEET_RANGE", "Dev")
 
 NOT_SCHEDULABLE = ["QUEUED", "INITIALIZING", "RUNNING", "CANCELING"]
-ALREADY_RAN = ["COMPLETE", "SYSTEM_ERROR", "EXECUTOR_ERROR"]
-
-CPUS = 24
-
+ALREADY_RAN = ["COMPLETE", "SYSTEM_ERROR", "EXECUTOR_ERROR", "UNKNOWN"]
 
 def model_tee(sheet):
     # Read Google Sheet into Dataframe
@@ -83,7 +80,6 @@ def startJobsOnEmptyNFS(sheet_data):
 
 def computeParams(next_run):
     return {
-        "cpus": CPUS,
         "nfs": next_run[0],
         "studyId": next_run[7],
         "analysisId": next_run[8]

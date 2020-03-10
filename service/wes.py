@@ -6,10 +6,16 @@ import asyncio
 import pandas as pd
 from urllib import request
 
-WES_BASE = "https://wes.rdpc.cancercollaboratory.org/api/v1/runs/"
+ALIGN_CPUS = int(os.getenv("ALIGN_CPUS", "24"))
 MIN_PROCESS_MEM = 20
 STORAGE_ROOT = os.getenv("STORAGE_ROOT", "./static")
-
+WES_BASE = os.getenv("WES_BASE")
+SONG_URL = os.getenv("SONG_URL")
+SCORE_URL = os.getenv("SCORE_URL")
+INTERMEDIATE_SONG_URL = os.getenv("INTERMEDIATE_SONG_URL")
+ICGC_SCORE_URL = os.getenv("ICGC_SCORE_URL")
+API_TOKEN = os.getenv("SONG_API_TOKEN")
+ICGC_SCORE_TOKEN = os.getenv("ICGC_SCORE_API_TOKEN")
 
 def getWesRuns(wesIds):
     loop = asyncio.get_event_loop()
@@ -50,44 +56,37 @@ def getWesRunIds():
 
 
 def startWesRuns(paramsList):
-    # Get tokens from env
-    API_TOKEN = os.getenv("SONG_API_TOKEN")
-    ICGC_SCORE_TOKEN = os.getenv("ICGC_SCORE_API_TOKEN") # icgc-dcc
-
     loop = asyncio.get_event_loop()
-    coroutines = [startVariableParamsRun(
-        params, API_TOKEN, ICGC_SCORE_TOKEN) for params in paramsList]
+    coroutines = [startVariableParamsRun(params) for params in paramsList]
     return loop.run_until_complete(asyncio.gather(*coroutines))
 
 
-async def startVariableParamsRun(params, api_token, icgc_score_token, semaphore=asyncio.Semaphore(5)):
+async def startVariableParamsRun(params, semaphore=asyncio.Semaphore(5)):
     async with semaphore:
         async with aiohttp.ClientSession() as session:
             print("Starting new job for analysisId: ", params["analysisId"])
 
-            cpus = params["cpus"]
-            mem = max((params["cpus"] * 3) + 2, MIN_PROCESS_MEM)
+            cpus = ALIGN_CPUS
+            mem = max((cpus * 3) + 2, MIN_PROCESS_MEM)
             nfs = params["nfs"]
             analysisId = params["analysisId"]
             studyId = params["studyId"]
 
+            # TODO: Check params with Junjun
             payload = {
                 "workflow_url": "icgc-argo/dna-seq-processing-wfs",
                 "workflow_params": {
                     "study_id": studyId,
                     "analysis_id": analysisId,
-                    "song_url": "https://song.qa.argo.cancercollaboratory.org",
-                    "score_url": "https://score.qa.argo.cancercollaboratory.org",
-                    "api_token": api_token,
+                    "song_url": SONG_URL,
+                    "score_url": SCORE_URL,
+                    "api_token": API_TOKEN,
                     "ref_genome_fa": "/{}/reference/GRCh38_hla_decoy_ebv/GRCh38_hla_decoy_ebv.fa".format(nfs),
                     "cpus": 2,
                     "mem": 4,
                     "download": {
-                        # "song_url": "https://intermediate-song.qa.argo.cancercollaboratory.org",
                         "song_cpus": 2,
                         "song_mem": 2,
-                        # "score_url": "https://storage.cancercollaboratory.org",
-                        # "score_api_token": score_api_token,
                         "score_cpus": 8,
                         "score_mem": 18
                     },
@@ -142,6 +141,11 @@ async def startVariableParamsRun(params, api_token, icgc_score_token, semaphore=
                     "revision": "master"
                 }
             }
+
+            if INTERMEDIATE_SONG_URL:
+                payload["workflow_params"]["download"]["song_url"] = INTERMEDIATE_SONG_URL
+                payload["workflow_params"]["download"]["score_url"] = ICGC_SCORE_URL
+                payload["workflow_params"]["download"]["score_api_token"] = ICGC_SCORE_TOKEN
 
             async with session.post(WES_BASE, json=payload) as response:
                 data = await response.json()
