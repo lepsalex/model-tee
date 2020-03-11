@@ -6,16 +6,6 @@ import asyncio
 import pandas as pd
 from urllib import request
 
-ALIGN_CPUS = int(os.getenv("ALIGN_CPUS", "24"))
-MIN_PROCESS_MEM = 20
-STORAGE_ROOT = os.getenv("STORAGE_ROOT", "./static")
-WES_BASE = os.getenv("WES_BASE")
-SONG_URL = os.getenv("SONG_URL")
-SCORE_URL = os.getenv("SCORE_URL")
-INTERMEDIATE_SONG_URL = os.getenv("INTERMEDIATE_SONG_URL")
-ICGC_SCORE_URL = os.getenv("ICGC_SCORE_URL")
-API_TOKEN = os.getenv("SONG_API_TOKEN")
-ICGC_SCORE_TOKEN = os.getenv("ICGC_SCORE_API_TOKEN")
 
 def getWesRuns(wesIds):
     loop = asyncio.get_event_loop()
@@ -32,7 +22,7 @@ def getRunsAsDataframe(wesIds):
 
 async def getWesRun(wesId):
     async with aiohttp.ClientSession() as session:
-        async with session.get("{}{}".format(WES_BASE, wesId.strip())) as response:
+        async with session.get("{}/{}".format(os.getenv("WES_BASE"), wesId.strip())) as response:
             # TODO remove this try.except in prod, it is here because some runs do not have analysis id
             try:
                 data = await response.json()
@@ -51,23 +41,34 @@ async def getWesRun(wesId):
 
 
 def getWesRunIds():
-    data = requests.get(WES_BASE).json()
+    data = requests.get(os.getenv("WES_BASE")).json()
     return [run["run_id"] for run in data["runs"]]
 
 
 def startWesRuns(paramsList):
+    config = {
+        "ALIGN_CPUS": int(os.getenv("ALIGN_CPUS", "24")),
+        "MIN_PROCESS_MEM": 20,
+        "SONG_URL": os.getenv("SONG_URL"),
+        "SCORE_URL": os.getenv("SCORE_URL"),
+        "INTERMEDIATE_SONG_URL": os.getenv("INTERMEDIATE_SONG_URL"),
+        "ICGC_SCORE_URL": os.getenv("ICGC_SCORE_URL"),
+        "SONG_API_TOKEN": os.getenv("SONG_API_TOKEN"),
+        "ICGC_SCORE_TOKEN": os.getenv("ICGC_SCORE_API_TOKEN")
+    }
+
     loop = asyncio.get_event_loop()
-    coroutines = [startVariableParamsRun(params) for params in paramsList]
+    coroutines = [startVariableParamsRun(params, config) for params in paramsList]
     return loop.run_until_complete(asyncio.gather(*coroutines))
 
 
-async def startVariableParamsRun(params, semaphore=asyncio.Semaphore(5)):
+async def startVariableParamsRun(params, config, semaphore=asyncio.Semaphore(5)):
     async with semaphore:
         async with aiohttp.ClientSession() as session:
             print("Starting new job for analysisId: ", params["analysisId"])
 
-            cpus = ALIGN_CPUS
-            mem = max((cpus * 3) + 2, MIN_PROCESS_MEM)
+            cpus = config["ALIGN_CPUS"]
+            mem = max((cpus * 3) + 2, config["MIN_PROCESS_MEM"])
             nfs = params["nfs"]
             analysisId = params["analysisId"]
             studyId = params["studyId"]
@@ -78,9 +79,9 @@ async def startVariableParamsRun(params, semaphore=asyncio.Semaphore(5)):
                 "workflow_params": {
                     "study_id": studyId,
                     "analysis_id": analysisId,
-                    "song_url": SONG_URL,
-                    "score_url": SCORE_URL,
-                    "api_token": API_TOKEN,
+                    "song_url": config["SONG_URL"],
+                    "score_url": config["SCORE_URL"],
+                    "api_token": config["SONG_API_TOKEN"],
                     "ref_genome_fa": "/{}/reference/GRCh38_hla_decoy_ebv/GRCh38_hla_decoy_ebv.fa".format(nfs),
                     "cpus": 2,
                     "mem": 4,
@@ -99,7 +100,7 @@ async def startVariableParamsRun(params, semaphore=asyncio.Semaphore(5)):
                         "mem": mem
                     },
                     "bamMergeSortMarkdup": {
-                         "cpus": 4,
+                        "cpus": 4,
                         "mem": 18
                     },
                     "payloadGenDnaAlignment": {
@@ -138,17 +139,20 @@ async def startVariableParamsRun(params, semaphore=asyncio.Semaphore(5)):
                 },
                 "workflow_engine_params": {
                     "work_dir": "/{}/work".format(nfs),
-                    "revision": "master"
+                    "revision": "1.0.0"
                 }
             }
 
-            if INTERMEDIATE_SONG_URL:
-                payload["workflow_params"]["download"]["song_url"] = INTERMEDIATE_SONG_URL
-                payload["workflow_params"]["download"]["score_url"] = ICGC_SCORE_URL
-                payload["workflow_params"]["download"]["score_api_token"] = ICGC_SCORE_TOKEN
+            if config["INTERMEDIATE_SONG_URL"]:
+                payload["workflow_params"]["download"]["song_url"] = config["INTERMEDIATE_SONG_URL"]
+                payload["workflow_params"]["download"]["score_url"] = config["ICGC_SCORE_URL"]
+                payload["workflow_params"]["download"]["score_api_token"] = config["ICGC_SCORE_TOKEN"]
+            
+            print(payload)
 
-            async with session.post(WES_BASE, json=payload) as response:
+            async with session.post(os.getenv("WES_BASE"), json=payload) as response:
                 data = await response.json()
+                print(data)
                 # return format for easy write into sheets as column
                 return [data["run_id"]]
 

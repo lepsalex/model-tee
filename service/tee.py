@@ -37,6 +37,10 @@ def updateSheetWithLatest(sheet_data):
     # get all runIds
     run_ids = getWesRunIds()
 
+    # if there is no data, just return the sheet data
+    if len(run_ids) is 0:
+        return sheet_data
+
     # get details for all runIds (we need analysisId)
     latest_data = getRunsAsDataframe(run_ids)
 
