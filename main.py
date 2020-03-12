@@ -20,8 +20,6 @@ sheet = Sheet(SPREADSHEET_ID)
 model_tee(sheet)
 
 # Message function to run on every message from Kafka on defined topic
-
-
 def onMessageFunc(message):
     print("Workflow event received ... applying filter ...")
     if message.value["event"] == "completed":
