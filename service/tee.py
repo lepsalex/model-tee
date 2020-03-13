@@ -8,6 +8,7 @@ RANGE = os.getenv("GOOGLE_SHEET_RANGE", "Dev")
 NOT_SCHEDULABLE = ["QUEUED", "INITIALIZING", "RUNNING", "CANCELING"]
 ALREADY_RAN = ["COMPLETE", "SYSTEM_ERROR", "EXECUTOR_ERROR", "UNKNOWN"]
 
+
 def model_tee(sheet):
     # Read Google Sheet into Dataframe
     sheet_data = sheet.read(RANGE)
@@ -39,6 +40,7 @@ def updateSheetWithLatest(sheet_data):
 
     # if there is no data, just return the sheet data
     if len(run_ids) == 0:
+        print("Warning: No runs!")
         return sheet_data
 
     # get details for all runIds (we need analysisId)
@@ -46,6 +48,7 @@ def updateSheetWithLatest(sheet_data):
 
     # if we don't have any non-buggy runs exit
     if latest_data.size == 0:
+        print("Warning: Non-buggy runs == 0")
         return sheet_data
 
     # take only the latest entry per analysis_id (data is sorted by date at server)
@@ -92,3 +95,26 @@ def computeParams(next_run):
         "studyId": next_run[7],
         "analysisId": next_run[8]
     }
+
+
+logo_gram = [
+    "\n",
+    "██──▀██▀▀▀██▀──██\n",
+    "█▀█▄──▀█▄█▀──▄█▀█\n",
+    "██▄▀█▄──▀──▄█▀▄██\n",
+    "█▄▀█▄█─█▄█─█▄█▀▄█\n",
+    "─▀█▄██─███─██▄█▀─\n",
+    "█──────▐█▌──────█\n",
+    "██▌─▄█─███─█▄─▐██\n",
+    "██▌▐██─▀▀▀─██▌▐██\n",
+    "██▌▐█████████▌▐█▀\n",
+    "▀█▌▐██─▄▄▄─██▌▐█─\n",
+    "─▀──█▌▐███▌▐█──▀─\n",
+    "──────█████──────\n"
+]
+
+
+def print_start_screen():
+    for line in logo_gram:
+        print(line)
+        sleep(0.7)

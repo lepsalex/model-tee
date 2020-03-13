@@ -1,7 +1,7 @@
 import os
 from kafka import KafkaConsumer
 from service.sheets import Sheet
-from service.tee import model_tee
+from service.tee import model_tee, print_start_screen
 from service.kafka import consumeTopicWith
 from time import sleep
 from dotenv import load_dotenv
@@ -22,22 +22,10 @@ model_tee(sheet)
 # Message function to run on every message from Kafka on defined topic
 def onMessageFunc(message):
     print("Workflow event received ... applying filter ...")
+
     if message.value["event"] == "completed":
         print("\nModel T roll out!")
-        print("\n\
-        ██──▀██▀▀▀██▀──██\n\
-        █▀█▄──▀█▄█▀──▄█▀█\n\
-        ██▄▀█▄──▀──▄█▀▄██\n\
-        █▄▀█▄█─█▄█─█▄█▀▄█\n\
-        ─▀█▄██─███─██▄█▀─\n\
-        █──────▐█▌──────█\n\
-        ██▌─▄█─███─█▄─▐██\n\
-        ██▌▐██─▀▀▀─██▌▐██\n\
-        ██▌▐█████████▌▐█▀\n\
-        ▀█▌▐██─▄▄▄─██▌▐█─\n\
-        ─▀──█▌▐███▌▐█──▀─\n\
-        ──────█████──────\n")
-
+        print_start_screen()
         model_tee(sheet)
     else:
         print("Event does not pass filter!")

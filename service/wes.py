@@ -16,8 +16,7 @@ def getWesRuns(wesIds):
 def getRunsAsDataframe(wesIds):
     runs = getWesRuns(wesIds)
     # TODO remove this step in prod, it is here because some runs do not have analysis id
-    runs = [run for run in runs if run and "start" in run.keys()]
-    runs = list(filter(None, runs))
+    runs = [run for run in runs if run]
     return pd.DataFrame(runs)
 
 
@@ -37,7 +36,8 @@ async def getWesRun(wesId):
                     "duration": data["run_log"]["duration"],
                     "tasks": list(filter(None, map(processTasks, data["task_logs"])))
                 }
-            except Exception:
+            except Exception as e:
+                print("getWesRun exception: ", e)
                 pass
 
 
@@ -162,7 +162,7 @@ def processTasks(task):
             "process": task["process"],
             "tag": task["tag"],
             "cpus": task["cpus"],
-            "memory": abs(task["memory"]),
+            "memory": task["memory"],
             "duration": task["duration"],
             "realtime": task["realtime"]
         }
