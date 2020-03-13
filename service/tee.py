@@ -38,11 +38,15 @@ def updateSheetWithLatest(sheet_data):
     run_ids = getWesRunIds()
 
     # if there is no data, just return the sheet data
-    if len(run_ids) is 0:
+    if len(run_ids) == 0:
         return sheet_data
 
     # get details for all runIds (we need analysisId)
     latest_data = getRunsAsDataframe(run_ids)
+
+    # if we don't have any non-buggy runs exit
+    if latest_data.size == 0:
+        return sheet_data
 
     # take only the latest entry per analysis_id (data is sorted by date at server)
     latest_data = latest_data.sort_values(

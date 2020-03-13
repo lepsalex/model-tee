@@ -16,7 +16,8 @@ def getWesRuns(wesIds):
 def getRunsAsDataframe(wesIds):
     runs = getWesRuns(wesIds)
     # TODO remove this step in prod, it is here because some runs do not have analysis id
-    runs = [run for run in runs if run]
+    runs = [run for run in runs if run and "start" in run.keys()]
+    runs = list(filter(None, runs))
     return pd.DataFrame(runs)
 
 
@@ -54,7 +55,8 @@ def startWesRuns(paramsList):
         "INTERMEDIATE_SONG_URL": os.getenv("INTERMEDIATE_SONG_URL"),
         "ICGC_SCORE_URL": os.getenv("ICGC_SCORE_URL"),
         "SONG_API_TOKEN": os.getenv("SONG_API_TOKEN"),
-        "ICGC_SCORE_TOKEN": os.getenv("ICGC_SCORE_API_TOKEN")
+        "ICGC_SCORE_TOKEN": os.getenv("ICGC_SCORE_API_TOKEN"),
+        "WF_VERSION": os.getenv("WF_VERSION")
     }
 
     loop = asyncio.get_event_loop()
@@ -139,7 +141,7 @@ async def startVariableParamsRun(params, config, semaphore=asyncio.Semaphore(5))
                 },
                 "workflow_engine_params": {
                     "work_dir": "/{}/work".format(nfs),
-                    "revision": "1.0.0"
+                    "revision": config["WF_VERSION"]
                 }
             }
 
@@ -148,11 +150,8 @@ async def startVariableParamsRun(params, config, semaphore=asyncio.Semaphore(5))
                 payload["workflow_params"]["download"]["score_url"] = config["ICGC_SCORE_URL"]
                 payload["workflow_params"]["download"]["score_api_token"] = config["ICGC_SCORE_TOKEN"]
             
-            print(payload)
-
             async with session.post(os.getenv("WES_BASE"), json=payload) as response:
                 data = await response.json()
-                print(data)
                 # return format for easy write into sheets as column
                 return [data["run_id"]]
 
