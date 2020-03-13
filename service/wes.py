@@ -36,8 +36,8 @@ async def getWesRun(wesId):
                     "duration": data["run_log"]["duration"],
                     "tasks": list(filter(None, map(processTasks, data["task_logs"])))
                 }
-            except Exception as e:
-                print("getWesRun exception: ", e)
+            except Exception as ex:
+                print("getWesRun exception for run {}: {}".format(wesId.strip(), ex))
                 pass
 
 
