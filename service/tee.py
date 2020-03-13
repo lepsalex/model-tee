@@ -3,15 +3,14 @@ import pandas as pd
 from time import sleep
 from service.wes import getWesRunIds, getRunsAsDataframe, startWesRuns
 
-RANGE = os.getenv("GOOGLE_SHEET_RANGE", "Dev")
-
 NOT_SCHEDULABLE = ["QUEUED", "INITIALIZING", "RUNNING", "CANCELING"]
 ALREADY_RAN = ["COMPLETE", "SYSTEM_ERROR", "EXECUTOR_ERROR", "UNKNOWN"]
 
 
 def model_tee(sheet):
     # Read Google Sheet into Dataframe
-    sheet_data = sheet.read(RANGE)
+    sheet_range = os.getenv("GOOGLE_SHEET_RANGE")
+    sheet_data = sheet.read(os.getenv("GOOGLE_SHEET_RANGE"))
 
     # Update job status
     print("Updating sheet data with latest from Cargo ...")
@@ -31,7 +30,7 @@ def model_tee(sheet):
 
     # Write sheet
     print("Writing sheet data to Google Sheets ...")
-    sheet.write(RANGE, sheet_data)
+    sheet.write(self.sheet_range, sheet_data)
 
 
 def updateSheetWithLatest(sheet_data):
