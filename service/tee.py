@@ -86,7 +86,7 @@ def startJobsOnEmptyNFS(sheet_data):
     newRuns = startWesRuns(params)
 
     if (len(newRuns) > 0):
-        print("New runs started: ", newRuns[0])
+        print("New runs started: \n", "\n".newRuns.join(newRuns))
 
 
 def computeParams(next_run):
