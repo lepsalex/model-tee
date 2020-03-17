@@ -75,7 +75,6 @@ async def startVariableParamsRun(params, config, semaphore=asyncio.Semaphore(5))
             analysisId = params["analysisId"]
             studyId = params["studyId"]
 
-            # TODO: Check params with Junjun
             payload = {
                 "workflow_url": "icgc-argo/dna-seq-processing-wfs",
                 "workflow_params": {
