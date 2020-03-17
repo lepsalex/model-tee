@@ -3,13 +3,13 @@ import pandas as pd
 from time import sleep
 from service.wes import getWesRunIds, getRunsAsDataframe, startWesRuns
 
-RANGE = os.getenv("GOOGLE_SHEET_RANGE", "Dev")
-
 NOT_SCHEDULABLE = ["QUEUED", "INITIALIZING", "RUNNING", "CANCELING"]
 ALREADY_RAN = ["COMPLETE", "SYSTEM_ERROR", "EXECUTOR_ERROR", "UNKNOWN"]
 
 
 def model_tee(sheet):
+    RANGE = os.getenv("GOOGLE_SHEET_RANGE")
+
     # Read Google Sheet into Dataframe
     sheet_data = sheet.read(RANGE)
 
@@ -67,12 +67,10 @@ def updateSheetWithLatest(sheet_data):
 
 def startJobsOnEmptyNFS(sheet_data):
     # check directories that are in use
-    not_schedulable_work_dirs = sheet_data.loc[sheet_data["state"].isin(
-        NOT_SCHEDULABLE)].groupby(["work_dir"])
+    not_schedulable_work_dirs = sheet_data.loc[sheet_data["state"].isin(NOT_SCHEDULABLE)].groupby(["work_dir"])
 
     # filter available directories (all dirs minus dirs in use)
-    eligible_workdirs = sheet_data.loc[~sheet_data["work_dir"].isin(
-        not_schedulable_work_dirs.groups.keys())]
+    eligible_workdirs = sheet_data.loc[~sheet_data["work_dir"].isin(not_schedulable_work_dirs.groups.keys())]
 
     # filter out any analyses that have already been completed
     eligible_analyses = eligible_workdirs.loc[~sheet_data["state"].isin(ALREADY_RAN)]
