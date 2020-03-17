@@ -64,7 +64,7 @@ def startWesRuns(paramsList):
     return loop.run_until_complete(asyncio.gather(*coroutines))
 
 
-async def startVariableParamsRun(params, config, semaphore=asyncio.Semaphore(5)):
+async def startVariableParamsRun(params, config, semaphore=asyncio.Semaphore(1)):
     async with semaphore:
         async with aiohttp.ClientSession() as session:
             print("Starting new job for analysisId: ", params["analysisId"])
