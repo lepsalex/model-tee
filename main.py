@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # The ID and range of the spreadsheet.
-SPREADSHEET_ID = os.getenv("GOOGLE_SHEET_ID", "13uxLJEjv5m6Q4nNOAsgeIKs8gm2rMctBK2CDXL5c4lU")
+SPREADSHEET_ID = os.getenv("GOOGLE_SHEET_ID")
 
 # Init Spreadsheet
 print("Getting sheet ...")
