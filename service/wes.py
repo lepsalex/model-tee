@@ -150,9 +150,10 @@ async def startVariableParamsRun(params, config, semaphore=asyncio.Semaphore(1))
                 payload["workflow_params"]["download"]["song_url"] = config["INTERMEDIATE_SONG_URL"]
                 payload["workflow_params"]["download"]["score_url"] = config["ICGC_SCORE_URL"]
                 payload["workflow_params"]["download"]["score_api_token"] = config["ICGC_SCORE_TOKEN"]
-            
+
             async with session.post(os.getenv("WES_BASE"), json=payload) as response:
                 data = await response.json()
+                print("New run started with runId: ", data["run_id"])
                 # return format for easy write into sheets as column
                 return [data["run_id"]]
 
