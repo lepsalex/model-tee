@@ -139,8 +139,9 @@ async def startVariableParamsRun(params, config, semaphore=asyncio.Semaphore(1))
                     "cleanup": True
                 },
                 "workflow_engine_params": {
-                    "work_dir": "/{}/work".format(nfs),
+                    "launch_dir": "/{}/launch".format(nfs),
                     "project_dir": "/{}/projects".format(nfs),
+                    "work_dir": "/{}/work".format(nfs),
                     "revision": config["WF_VERSION"]
                 }
             }
