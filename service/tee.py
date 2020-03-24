@@ -9,6 +9,7 @@ ALREADY_RAN = ["COMPLETE", "SYSTEM_ERROR", "EXECUTOR_ERROR", "UNKNOWN"]
 
 def model_tee(sheet):
     RANGE = os.getenv("GOOGLE_SHEET_RANGE")
+    MAX_RUNS = os.getenv("MAX_RUNS")
 
     # Read Google Sheet into Dataframe
     sheet_data = sheet.read(RANGE)
@@ -17,17 +18,25 @@ def model_tee(sheet):
     print("Updating sheet data with latest from Cargo ...")
     sheet_data = updateSheetWithLatest(sheet_data)
 
-    # Start jobs if possible
-    print("Starting new jobs if NFS available ...")
-    startJobsOnEmptyNFS(sheet_data)
+    # Compute job availability (MAX_RUNS - Current Running Jobs)
+    current_run_count = sheet_data.groupby("state")["state"].count()["RUNNING"]
+    run_availability = int(MAX_RUNS) - int(current_run_count)
 
-    print("Sleep for 10 ...")
-    for x in reversed(range(10)):
-        print("."[0:1]*x, x)
-        sleep(1)
+    # Start new jobs if there is room
+    if (run_availability > 0):
+        # Start jobs if possible
+        print("Starting new jobs if NFS available ...")
+        startJobsOnEmptyNFS(sheet_data, run_availability)
 
-    # Update again (after 10 second delay)
-    sheet_data = updateSheetWithLatest(sheet_data)
+        print("Sleep for 10 ...")
+        for x in reversed(range(10)):
+            print("."[0:1]*x, x)
+            sleep(1)
+
+        # Update again (after 10 second delay)
+        sheet_data = updateSheetWithLatest(sheet_data)
+    else:
+        print("WES currently at max run capacity ({})".format(MAX_RUNS))
 
     # Write sheet
     print("Writing sheet data to Google Sheets ...")
@@ -65,7 +74,7 @@ def updateSheetWithLatest(sheet_data):
     return sheet_data.drop(["state_y", "state_x", "run_id_x", "run_id_y"], axis=1)
 
 
-def startJobsOnEmptyNFS(sheet_data):
+def startJobsOnEmptyNFS(sheet_data, run_availability):
     # check directories that are in use
     not_schedulable_work_dirs = sheet_data.loc[sheet_data["state"].isin(NOT_SCHEDULABLE)].groupby(["work_dir"])
 
@@ -75,12 +84,13 @@ def startJobsOnEmptyNFS(sheet_data):
     # filter out any analyses that have already been completed
     eligible_analyses = eligible_workdirs.loc[~sheet_data["state"].isin(ALREADY_RAN)]
 
-    # get one analysis per eligible work directory
-    next_runs = eligible_analyses.groupby("work_dir").first().reset_index()
+    # get one analysis per eligible work directory (limit to max run_availability)
+    next_runs = eligible_analyses.groupby("work_dir").first().reset_index().head(run_availability)
 
     # build run params
     params = [computeParams(next_run) for next_run in next_runs.values.tolist()]
 
+    # start runs
     newRuns = startWesRuns(params)
 
 
