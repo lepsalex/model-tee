@@ -28,15 +28,34 @@ def model_tee(sheet):
         print("Starting new jobs if NFS available ...")
         startJobsOnEmptyNFS(sheet_data, run_availability)
 
-        print("Sleep for 10 ...")
-        for x in reversed(range(10)):
-            print("."[0:1]*x, x)
-            sleep(1)
-
         # Update again (after 10 second delay)
+        print_sleep_for_10()
         sheet_data = updateSheetWithLatest(sheet_data)
     else:
         print("WES currently at max run capacity ({})".format(MAX_RUNS))
+
+    # Write sheet
+    print("Writing sheet data to Google Sheets ...")
+    sheet.write(RANGE, sheet_data)
+
+
+def model_recall(sheet, runIds):
+    RANGE = os.getenv("GOOGLE_SHEET_RANGE")
+
+    # Read Google Sheet into Dataframe
+    sheet_data = sheet.read(RANGE)
+
+    retry_runs = sheet_data.loc[sheet_data["run_id"].isin(runIds)]
+
+    # build run params as
+    params = [computeRerunParams(retry_run) for retry_run in retry_runs.values.tolist()]
+
+    # start re-runs
+    newRuns = startWesRuns(params)
+
+    # Update again (after 10 second delay)
+    print_sleep_for_10()
+    sheet_data = updateSheetWithLatest(sheet_data)
 
     # Write sheet
     print("Writing sheet data to Google Sheets ...")
@@ -100,6 +119,22 @@ def computeParams(next_run):
         "studyId": next_run[7],
         "analysisId": next_run[8]
     }
+
+
+def computeRerunParams(next_run):
+    return {
+        "studyId": next_run[6],
+        "analysisId": next_run[7],
+        "nfs": next_run[8],
+        "resume": next_run[9]
+    }
+
+
+def print_sleep_for_10():
+    print("Sleep for 10 ...")
+    for x in reversed(range(10)):
+        print("."[0:1]*x, x)
+        sleep(1)
 
 
 logo_gram = [

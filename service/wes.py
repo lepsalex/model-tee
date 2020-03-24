@@ -74,6 +74,7 @@ async def startVariableParamsRun(params, config, semaphore=asyncio.Semaphore(1))
             nfs = params["nfs"]
             analysisId = params["analysisId"]
             studyId = params["studyId"]
+            resume = params["resume"] if "resume" in params else None
 
             payload = {
                 "workflow_url": "icgc-argo/dna-seq-processing-wfs",
@@ -146,7 +147,10 @@ async def startVariableParamsRun(params, config, semaphore=asyncio.Semaphore(1))
                 }
             }
 
-            if config["INTERMEDIATE_SONG_URL"]:
+            if (resume):
+                payload["workflow_engine_params"]["resume"] = resume
+
+            if "INTERMEDIATE_SONG_URL" in config:
                 payload["workflow_params"]["download"]["song_url"] = config["INTERMEDIATE_SONG_URL"]
                 payload["workflow_params"]["download"]["score_url"] = config["ICGC_SCORE_URL"]
                 payload["workflow_params"]["download"]["score_api_token"] = config["ICGC_SCORE_TOKEN"]
