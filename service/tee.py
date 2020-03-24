@@ -80,8 +80,7 @@ def updateSheetWithLatest(sheet_data):
         return sheet_data
 
     # take only the latest entry per analysis_id (data is sorted by date at server)
-    latest_data = latest_data.sort_values(
-        ["start"]).groupby("analysis_id").head(1)
+    latest_data = latest_data.sort_values(["start"], ascending=False).groupby("analysis_id").head(1)
 
     # Update sheet
     sheet_data = pd.merge(
