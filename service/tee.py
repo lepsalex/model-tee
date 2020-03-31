@@ -102,8 +102,12 @@ def startJobsOnEmptyNFS(sheet_data, run_availability):
     # filter out any analyses that have already been completed
     eligible_analyses = eligible_workdirs.loc[~sheet_data["state"].isin(ALREADY_RAN)]
 
+    # NOTE: ".sample(...)" is used below in order pull a random work_dir from the list otherwise
+    # we would always be scheduling primarily on NFS-1/NFS-2 until all those runs were complete and then on
+    # NFS-3/NFS-4, not that it would necessarily be a problem but would like to see more normal distribution
+
     # get one analysis per eligible work directory (limit to max run_availability)
-    next_runs = eligible_analyses.groupby("work_dir").first().reset_index().head(run_availability)
+    next_runs = eligible_analyses.groupby("work_dir").first().reset_index().sample(run_availability)
 
     # build run params
     params = [computeParams(next_run) for next_run in next_runs.values.tolist()]
