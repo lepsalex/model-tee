@@ -20,7 +20,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: model-tee
-          image: lepsalex/model-tee:1.4.2
+          image: lepsalex/model-tee:1.5.0
           imagePullPolicy: Always
           volumeMounts:
             - name: model-tee-app
