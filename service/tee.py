@@ -28,8 +28,8 @@ def model_tee(sheet):
         print("Starting new jobs if NFS available ...")
         startJobsOnEmptyNFS(sheet_data, run_availability)
 
-        # Update again (after 10 second delay)
-        print_sleep_for_10()
+        # Update again (after 20 second delay)
+        print_sleep_for_n(20)
         sheet_data = updateSheetWithLatest(sheet_data)
     else:
         print("WES currently at max run capacity ({})".format(MAX_RUNS))
@@ -53,8 +53,8 @@ def model_recall(sheet, runIds):
     # start re-runs
     newRuns = startWesRuns(params)
 
-    # Update again (after 10 second delay)
-    print_sleep_for_10()
+    # Update again (after 20 second delay)
+    print_sleep_for_n(20)
     sheet_data = updateSheetWithLatest(sheet_data)
 
     # Write sheet
@@ -139,10 +139,10 @@ def computeRerunParams(next_run):
     }
 
 
-def print_sleep_for_10():
-    print("Sleep for 10 ...")
-    for x in reversed(range(10)):
-        print("."[0:1]*x, x)
+def print_sleep_for_n(n = 10):
+    print("Sleep for {} ...".format(n))
+    for x in reversed(range(n)):
+        print("."[0:1]*min(x, 9), x)
         sleep(1)
 
 
