@@ -170,7 +170,9 @@ def processTasks(task):
             "cpus": task["cpus"],
             "memory": task["memory"],
             "duration": task["duration"],
-            "realtime": task["realtime"]
+            "realtime": task["realtime"],
+            "start": task["start_time"],
+            "end": task["end_time"]
         }
 
 
