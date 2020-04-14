@@ -15,7 +15,7 @@ sheet = Sheet(SPREADSHEET_ID)
 
 # Recall Script (to be run locally only!)
 recall_list = [
-    # 'wes-18383c5dd5634c319791084a2aa833fa'
+    # 'wes-d39fbd05d2c740b58c7e8ae4c3bc75bd',
 ]
 
 model_recall(sheet, recall_list)

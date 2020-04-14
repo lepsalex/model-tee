@@ -3,7 +3,7 @@ from service.sheets import Sheet
 from service.tee import model_recall
 from dotenv import load_dotenv
 import pandas as pd
-from pandas.io.json import json_normalize
+from pandas import json_normalize
 from service.wes import getWesRunIds, getRunsAsDataframe
 
 # load env from file if present
