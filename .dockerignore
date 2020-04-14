@@ -19,3 +19,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# non-release scripts
+recall.py
+task_data.py
+report.py
