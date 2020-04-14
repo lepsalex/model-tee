@@ -1,6 +1,6 @@
 import os
 from service.sheets import Sheet
-from service.tee import model_recall
+from service.tee import modelRecall
 from dotenv import load_dotenv
 
 # load env from file if present
@@ -18,4 +18,4 @@ recall_list = [
     # 'wes-d39fbd05d2c740b58c7e8ae4c3bc75bd',
 ]
 
-model_recall(sheet, recall_list)
+modelRecall(sheet, recall_list)

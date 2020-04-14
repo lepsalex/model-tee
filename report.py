@@ -1,7 +1,6 @@
 import os
 import numpy as np
 from service.sheets import Sheet
-from service.tee import model_recall
 from dotenv import load_dotenv
 import pandas as pd
 from pandas import json_normalize

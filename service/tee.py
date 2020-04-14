@@ -7,7 +7,7 @@ NOT_SCHEDULABLE = ["QUEUED", "INITIALIZING", "RUNNING", "CANCELING"]
 ALREADY_RAN = ["COMPLETE", "SYSTEM_ERROR", "EXECUTOR_ERROR", "UNKNOWN"]
 
 
-def model_tee(sheet):
+def modelTee(sheet):
     RANGE = os.getenv("GOOGLE_SHEET_RANGE")
     MAX_RUNS = os.getenv("MAX_RUNS")
 
@@ -29,7 +29,7 @@ def model_tee(sheet):
         startJobsOnEmptyNFS(sheet_data, run_availability)
 
         # Update again (after 20 second delay)
-        print_sleep_for_n(20)
+        printSleepForN(20)
         sheet_data = updateSheetWithLatest(sheet_data)
     else:
         print("WES currently at max run capacity ({})".format(MAX_RUNS))
@@ -39,7 +39,7 @@ def model_tee(sheet):
     sheet.write(RANGE, sheet_data)
 
 
-def model_recall(sheet, runIds):
+def modelRecall(sheet, runIds):
     RANGE = os.getenv("GOOGLE_SHEET_RANGE")
 
     # Read Google Sheet into Dataframe
@@ -54,7 +54,7 @@ def model_recall(sheet, runIds):
     newRuns = startWesRuns(params)
 
     # Update again (after 20 second delay)
-    print_sleep_for_n(20)
+    printSleepForN(20)
     sheet_data = updateSheetWithLatest(sheet_data)
 
     # Write sheet
@@ -139,32 +139,31 @@ def computeRerunParams(next_run):
     }
 
 
-def print_sleep_for_n(n = 10):
+def printSleepForN(n=10):
     print("Sleep for {} ...".format(n))
     for x in reversed(range(n)):
         print("."[0:1]*min(x, 9), x)
         sleep(1)
 
 
-logo_gram = [
-    "\n",
-    "██──▀██▀▀▀██▀──██",
-    "█▀█▄──▀█▄█▀──▄█▀█",
-    "██▄▀█▄──▀──▄█▀▄██",
-    "█▄▀█▄█─█▄█─█▄█▀▄█",
-    "─▀█▄██─███─██▄█▀─",
-    "█──────▐█▌──────█",
-    "██▌─▄█─███─█▄─▐██",
-    "██▌▐██─▀▀▀─██▌▐██",
-    "██▌▐█████████▌▐█▀",
-    "▀█▌▐██─▄▄▄─██▌▐█─",
-    "─▀──█▌▐███▌▐█──▀─",
-    "──────█████──────",
-    "\n"
-]
+def printStartScreen():
+    logo_gram = [
+        "\n",
+        "██──▀██▀▀▀██▀──██",
+        "█▀█▄──▀█▄█▀──▄█▀█",
+        "██▄▀█▄──▀──▄█▀▄██",
+        "█▄▀█▄█─█▄█─█▄█▀▄█",
+        "─▀█▄██─███─██▄█▀─",
+        "█──────▐█▌──────█",
+        "██▌─▄█─███─█▄─▐██",
+        "██▌▐██─▀▀▀─██▌▐██",
+        "██▌▐█████████▌▐█▀",
+        "▀█▌▐██─▄▄▄─██▌▐█─",
+        "─▀──█▌▐███▌▐█──▀─",
+        "──────█████──────",
+        "\n"
+    ]
 
-
-def print_start_screen():
     for line in logo_gram:
         print(line)
         sleep(0.7)
