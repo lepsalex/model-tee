@@ -26,17 +26,15 @@ ENV APP_USER wfuser
 ## copy Python dependencies from build image
 COPY --from=compile-image /opt/venv /opt/venv
 
-## set working directory
-WORKDIR $APP_HOME
-
 ## add user/group
 RUN addgroup --system --gid $APP_GID $APP_USER \
     && adduser --system --no-create-home -u $APP_UID --group $APP_USER \
     && mkdir -p $APP_HOME \
-    && chown -R $APP_UID:$APP_GID $APP_HOME
+    && chown -R $APP_UID:$APP_GID $APP_HOME \
+    && chmod -R 755 $APP_HOME
 
-USER $APP_USER
 WORKDIR $APP_HOME
+USER $APP_USER
 COPY ./ ./
 
 ## set python environment variables
