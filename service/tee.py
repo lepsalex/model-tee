@@ -19,7 +19,7 @@ def modelTee(sheet):
     sheet_data = updateSheetWithLatest(sheet_data)
 
     # Compute job availability (MAX_RUNS - Current Running Jobs)
-    current_run_count = sheet_data.groupby("state")["state"].count()["RUNNING"]
+    current_run_count = sheet_data.groupby("state")["state"].count().get("RUNNING", 0)
     run_availability = int(MAX_RUNS) - int(current_run_count)
 
     # Start new jobs if there is room
