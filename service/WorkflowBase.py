@@ -9,7 +9,10 @@ from abc import ABC, abstractmethod
 from service.sheets import Sheet
 
 
-class Workflow(ABC):
+class WorkflowBase(ABC):
+
+    NOT_SCHEDULABLE = ["QUEUED", "INITIALIZING", "RUNNING", "CANCELING"]
+    ALREADY_RAN = ["COMPLETE", "SYSTEM_ERROR", "EXECUTOR_ERROR", "UNKNOWN"]
 
     def __init__(self, config):
         # config
@@ -20,9 +23,20 @@ class Workflow(ABC):
         self.max_runs = config["max_runs"]
         self.max_cpus = config["max_cpus"]
 
+        # general env config (not specific to any workflow)
+        self.tainted_dir_list = os.getenv("TAINTED_DIR_LIST", "").split(",")
+
         # initial state
         self.sheet = Sheet(self.sheet_id)
         self.sheet_data = self.sheet.read(self.sheet_range)
+
+    @abstractmethod
+    def formatRunData(self, data):
+        """
+        Defines how to parse wes response data for this workflow.
+        Must be implemented, called from fetchWesRun()
+        """
+        pass
 
     @abstractmethod
     def mergeRunsWithSheetData(self, runs):
@@ -33,10 +47,10 @@ class Workflow(ABC):
         pass
 
     @abstractmethod
-    def formatRunData(self, data):
+    def computeNewRunParams(self, data):
         """
-        Defines how to parse wes response data for this workflow.
-        Must be implemented, called from fetchWesRun()
+        Method that creates a list of parameter dictionaries,
+        each entry representing the params for a new run
         """
         pass
 
@@ -51,15 +65,13 @@ class Workflow(ABC):
         if (run_availability > 0):
             # Start jobs if possible
             print("Starting new jobs if NFS available ...")
+            self.__startJobsOnEmptyNFS(run_availability)
 
             # Update again (after 20 second delay)
-            self.printSleepForN(20)
+            self.__printSleepForN(20)
             self.sheet_data = self.__updateSheetWithWesData()
         else:
             print("WES currently at max run capacity ({})".format(self.max_runs))
-
-        print(self.sheet_data.head())
-        print(run_availability)
 
     def __updateSheetWithWesData(self):
         runs = self.__fetchWesRunsAsDataframe()
@@ -114,8 +126,31 @@ class Workflow(ABC):
         """
         Compute job availability (ALIGN_MAX_RUNS - Current Running Jobs)
         """
-        current_run_count = self.sheet_data.groupby("state")["state"].count().get("RUNNING", 0)
+        current_run_count = self.sheet_data.groupby("state")["state"].count().get("RUNNING", 0) # too magic
         return int(self.max_runs) - int(current_run_count)
+
+    def __startJobsOnEmptyNFS(self, run_availability):
+        # check directories that are in use
+        not_schedulable_work_dirs = self.sheet_data.loc[self.sheet_data["state"].isin(self.NOT_SCHEDULABLE)].groupby(["work_dir"])
+
+        # filter available directories (set of all dirs minus dirs in use + tainted dirs from env)
+        unavailable_dir = {y for x in [not_schedulable_work_dirs.groups.keys(), self.tainted_dir_list] for y in x if y}
+        eligible_workdirs = self.sheet_data.loc[~self.sheet_data["work_dir"].isin(unavailable_dir)]
+
+        # filter out any analyses that have already been completed
+        eligible_analyses = eligible_workdirs.loc[~self.sheet_data["state"].isin(self.ALREADY_RAN)]
+
+        # NOTE: ".sample(...)" is used below in order pull a random work_dir from the list otherwise
+        # we would always be scheduling primarily on NFS-1/NFS-2 until all those runs were complete and then on
+        # NFS-3/NFS-4, not that it would necessarily be a problem but would like to see more normal distribution
+
+        # get one analysis per eligible work directory
+        # (limit to lesser of: total amount of runs possible vs. run_availability)
+        next_runs = eligible_analyses.groupby("work_dir").first().reset_index()
+        next_runs = next_runs.sample(min(run_availability, next_runs.shape[0]))
+
+        # build run params
+        params = [self.computeNewRunParams(next_run) for next_run in next_runs.iterrows()]
 
     def __printSleepForN(self, n=10):
         print("Sleep for {} ...".format(n))
@@ -140,32 +175,3 @@ class Workflow(ABC):
                 "start": task["start_time"],
                 "end": task["end_time"]
             }
-
-
-class AlignWorkflow(Workflow):
-
-    def __init__(self, config):
-        super().__init__(config)
-
-    def mergeRunsWithSheetData(self, runs):
-        # take only the latest entry per analysis_id (data is sorted by date at server)
-        latest_runs = runs.sort_values(["start"], ascending=False).groupby("analysis_id").head(1)
-
-        # Update sheet data
-        new_sheet_data = pd.merge(self.sheet_data, latest_runs[["analysis_id", "run_id", "state"]], on="analysis_id", how="left")
-        new_sheet_data["run_id"] = new_sheet_data["run_id_y"].fillna(new_sheet_data["run_id_x"])
-        new_sheet_data["state"] = new_sheet_data["state_y"].fillna(new_sheet_data["state_x"])
-
-        return new_sheet_data.drop(["state_y", "state_x", "run_id_x", "run_id_y"], axis=1)
-
-    def formatRunData(self, data):
-        return {
-            "analysis_id": data["request"]["workflow_params"]["analysis_id"],
-            "run_id": data["run_id"],
-            "state": data["state"],
-            "params": data["request"]["workflow_params"],
-            "start": data["run_log"]["start_time"],
-            "end": data["run_log"]["end_time"],
-            "duration": data["run_log"]["duration"],
-            "tasks": list(filter(None, map(self.processTasks, data["task_logs"])))
-        }

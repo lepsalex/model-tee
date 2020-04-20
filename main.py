@@ -1,6 +1,6 @@
 import os
 from kafka import KafkaConsumer
-from service.workflow import AlignWorkflow
+from service.AlignWorkflow import AlignWorkflow
 from service.sheets import Sheet
 from service.tee import modelTee, printStartScreen
 from service.kafka import consumeTopicWith
@@ -20,17 +20,17 @@ align_workflow = AlignWorkflow({
     "max_cpus": os.getenv("ALIGN_CPUS")
 })
 
-sanger_workflow = AlignWorkflow({
-    "sheet_id": os.getenv("SANGER_SHEET_ID"),
-    "sheet_range": os.getenv("SANGER_SHEET_RANGE"),
-    "wf_url": os.getenv("SANGER_WF_URL"),
-    "wf_version": os.getenv("SANGER_WF_VERSION"),
-    "max_runs": os.getenv("SANGER_MAX_RUNS"),
-    "max_cpus": os.getenv("SANGER_CPUS")
-})
-
-
 align_workflow.run()
+
+# sanger_workflow = AlignWorkflow({
+#     "sheet_id": os.getenv("SANGER_SHEET_ID"),
+#     "sheet_range": os.getenv("SANGER_SHEET_RANGE"),
+#     "wf_url": os.getenv("SANGER_WF_URL"),
+#     "wf_version": os.getenv("SANGER_WF_VERSION"),
+#     "max_runs": os.getenv("SANGER_MAX_RUNS"),
+#     "max_cpus": os.getenv("SANGER_CPUS")
+# })
+
 # sanger_workflow.updateSheetWithWesData()
 
 # # The ID and range of the spreadsheet.
