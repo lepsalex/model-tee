@@ -9,7 +9,7 @@ from service.wes import getWesRunIds, getRunsAsDataframe
 load_dotenv()
 
 # The ID and range of the spreadsheet.
-SPREADSHEET_ID = os.getenv("GOOGLE_SHEET_ID")
+SPREADSHEET_ID = os.getenv("ALIGN_SHEET_ID")
 
 # Init Spreadsheet
 print("Getting sheet ...")

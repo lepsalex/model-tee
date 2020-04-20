@@ -8,8 +8,8 @@ ALREADY_RAN = ["COMPLETE", "SYSTEM_ERROR", "EXECUTOR_ERROR", "UNKNOWN"]
 
 
 def modelTee(sheet):
-    RANGE = os.getenv("GOOGLE_SHEET_RANGE")
-    MAX_RUNS = os.getenv("MAX_RUNS")
+    RANGE = os.getenv("ALIGN_SHEET_RANGE")
+    ALIGN_MAX_RUNS = os.getenv("ALIGN_MAX_RUNS")
 
     # Read Google Sheet into Dataframe
     sheet_data = sheet.read(RANGE)
@@ -18,9 +18,9 @@ def modelTee(sheet):
     print("Updating sheet data with latest from Cargo ...")
     sheet_data = updateSheetWithLatest(sheet_data)
 
-    # Compute job availability (MAX_RUNS - Current Running Jobs)
+    # Compute job availability (ALIGN_MAX_RUNS - Current Running Jobs)
     current_run_count = sheet_data.groupby("state")["state"].count().get("RUNNING", 0)
-    run_availability = int(MAX_RUNS) - int(current_run_count)
+    run_availability = int(ALIGN_MAX_RUNS) - int(current_run_count)
 
     # Start new jobs if there is room
     if (run_availability > 0):
@@ -32,30 +32,7 @@ def modelTee(sheet):
         printSleepForN(20)
         sheet_data = updateSheetWithLatest(sheet_data)
     else:
-        print("WES currently at max run capacity ({})".format(MAX_RUNS))
-
-    # Write sheet
-    print("Writing sheet data to Google Sheets ...")
-    sheet.write(RANGE, sheet_data)
-
-
-def modelRecall(sheet, runIds):
-    RANGE = os.getenv("GOOGLE_SHEET_RANGE")
-
-    # Read Google Sheet into Dataframe
-    sheet_data = sheet.read(RANGE)
-
-    retry_runs = sheet_data.loc[sheet_data["run_id"].isin(runIds)]
-
-    # build run params as
-    params = [computeRerunParams(retry_run) for retry_run in retry_runs.values.tolist()]
-
-    # start re-runs
-    newRuns = startWesRuns(params)
-
-    # Update again (after 20 second delay)
-    printSleepForN(20)
-    sheet_data = updateSheetWithLatest(sheet_data)
+        print("WES currently at max run capacity ({})".format(ALIGN_MAX_RUNS))
 
     # Write sheet
     print("Writing sheet data to Google Sheets ...")
@@ -167,3 +144,26 @@ def printStartScreen():
     for line in logo_gram:
         print(line)
         sleep(0.7)
+
+
+def modelRecall(sheet, runIds):
+    RANGE = os.getenv("ALIGN_SHEET_RANGE")
+
+    # Read Google Sheet into Dataframe
+    sheet_data = sheet.read(RANGE)
+
+    retry_runs = sheet_data.loc[sheet_data["run_id"].isin(runIds)]
+
+    # build run params as
+    params = [computeRerunParams(retry_run) for retry_run in retry_runs.values.tolist()]
+
+    # start re-runs
+    newRuns = startWesRuns(params)
+
+    # Update again (after 20 second delay)
+    printSleepForN(20)
+    sheet_data = updateSheetWithLatest(sheet_data)
+
+    # Write sheet
+    print("Writing sheet data to Google Sheets ...")
+    sheet.write(RANGE, sheet_data)

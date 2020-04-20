@@ -56,7 +56,7 @@ def startWesRuns(paramsList):
         "ICGC_SCORE_URL": os.getenv("ICGC_SCORE_URL"),
         "SONG_API_TOKEN": os.getenv("SONG_API_TOKEN"),
         "ICGC_SCORE_TOKEN": os.getenv("ICGC_SCORE_API_TOKEN"),
-        "WF_VERSION": os.getenv("WF_VERSION")
+        "ALIGN_WF_VERSION": os.getenv("ALIGN_WF_VERSION")
     }
 
     loop = asyncio.get_event_loop()
@@ -143,7 +143,7 @@ async def startVariableParamsRun(params, config, semaphore=asyncio.Semaphore(1))
                     "launch_dir": "/{}/launch".format(nfs),
                     "project_dir": "/{}/projects".format(nfs),
                     "work_dir": "/{}/work".format(nfs),
-                    "revision": config["WF_VERSION"]
+                    "revision": config["ALIGN_WF_VERSION"]
                 }
             }
 
