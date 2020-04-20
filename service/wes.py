@@ -176,9 +176,9 @@ def processTasks(task):
         }
 
 
-def extractTaskInfo(id, task):
-    return [id, task["tag"], task["realtime"], task["cpus"]]
+# def extractTaskInfo(id, task):
+#     return [id, task["tag"], task["realtime"], task["cpus"]]
 
 
-def extractRunInfo(run):
-    return [extractTaskInfo(run["runId"], task) for task in run["tasks"] if task["process"] == "align"]
+# def extractRunInfo(run):
+#     return [extractTaskInfo(run["runId"], task) for task in run["tasks"] if task["process"] == "align"]
