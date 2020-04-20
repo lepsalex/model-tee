@@ -30,8 +30,8 @@ sanger_workflow = AlignWorkflow({
 })
 
 
-align_workflow.updateSheetWithWesData()
-sanger_workflow.updateSheetWithWesData()
+align_workflow.run()
+# sanger_workflow.updateSheetWithWesData()
 
 # # The ID and range of the spreadsheet.
 # SPREADSHEET_ID = os.getenv("ALIGN_SHEET_ID")
