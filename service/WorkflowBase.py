@@ -52,8 +52,11 @@ class WorkflowBase(ABC):
         """
         pass
 
-    def run(self):
-        self.__printStartScreen()
+    def run(self, quick = False):
+
+        # Print logogram if not in quick mode
+        if not quick:
+            self.__printStartScreen()
 
         # get latest run info for sheet data
         self.sheet_data = self.__updateSheetWithWesData()
@@ -75,7 +78,25 @@ class WorkflowBase(ABC):
 
         # Write sheet
         print("Writing sheet data to Google Sheets ...")
-        # sheet.write(self.sheet_range, self.sheet_data)
+        self.sheet.write(self.sheet_range, self.sheet_data)
+
+    def recall(self, run_ids):
+        # get latest run info for sheet data
+        sheet_data = self.__updateSheetWithWesData()
+
+        retry_runs = sheet_data.loc[sheet_data["run_id"].isin(run_ids)]
+
+        requests = [self.buildRunRequests(retry_run[1], True) for retry_run in retry_runs.iterrows()]
+
+        Wes.startWesRuns(requests)
+
+        # Update again (after 30 second delay)
+        self.__printSleepForN(30)
+        sheet_data = self.__updateSheetWithWesData()
+
+        # Write sheet
+        print("Writing sheet data to Google Sheets ...")
+        self.sheet.write(self.sheet_range, sheet_data)
 
     def __updateSheetWithWesData(self):
         runs = Wes.fetchWesRunsAsDataframeForWorkflow(self.wf_url, self.transformRunData)
@@ -128,7 +149,7 @@ class WorkflowBase(ABC):
     @classmethod
     def __printStartScreen(cls):
         print("\nModel T roll out!")
-        
+
         logo_gram = [
             "\n",
             "██──▀██▀▀▀██▀──██",

@@ -32,7 +32,7 @@ class AlignWorkflow(WorkflowBase):
 
         return new_sheet_data.drop(["state_y", "state_x", "run_id_x", "run_id_y"], axis=1)
 
-    def buildRunRequests(self, run):
+    def buildRunRequests(self, run, resume = False):
         config = {
             "study_id": run["study_id"],
             "analysis_id": run["analysis_id"],
@@ -40,5 +40,8 @@ class AlignWorkflow(WorkflowBase):
             "max_cpus": int(self.max_cpus),
             "min_mem": 20,
         }
+
+        if resume:
+            config["resume"] = run["run_id"]
 
         return AlignRequest(self.wf_url, config)

@@ -74,7 +74,7 @@ class AlignRequest(WorkflowRequest):
             "cleanup": True
         }
 
-        if "INTERMEDIATE_SONG_URL" in song_score_config:
+        if song_score_config.get("INTERMEDIATE_SONG_URL"):
             params["download"]["song_url"] = song_score_config["INTERMEDIATE_SONG_URL"]
             params["download"]["score_url"] = song_score_config["ICGC_SCORE_URL"]
             params["download"]["score_api_token"] = song_score_config["ICGC_SCORE_TOKEN"]

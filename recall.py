@@ -1,19 +1,21 @@
 import os
-from service.sheets import Sheet
-from service.tee import modelRecall
+from service.AlignWorkflow import AlignWorkflow
 from dotenv import load_dotenv
 
 # load env from file if present
 load_dotenv()
 
-# The ID and range of the spreadsheet.
-SPREADSHEET_ID = os.getenv("ALIGN_SHEET_ID")
-
-# Init Spreadsheet
-print("Getting sheet ...")
-sheet = Sheet(SPREADSHEET_ID)
+# Build workflow objects
+align_workflow = AlignWorkflow({
+    "sheet_id": os.getenv("ALIGN_SHEET_ID"),
+    "sheet_range": os.getenv("ALIGN_SHEET_RANGE"),
+    "wf_url": os.getenv("ALIGN_WF_URL"),
+    "wf_version": os.getenv("ALIGN_WF_VERSION"),
+    "max_runs": os.getenv("ALIGN_MAX_RUNS"),
+    "max_cpus": os.getenv("ALIGN_CPUS")
+})
 
 # Recall Script (to be run locally only!)
 recall_list = []
 
-modelRecall(sheet, recall_list)
+align_workflow.recall(recall_list)

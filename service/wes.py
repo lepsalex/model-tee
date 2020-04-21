@@ -48,8 +48,18 @@ class Wes:
         """
         async with aiohttp.ClientSession() as session:
             async with session.get("{}/{}".format(os.getenv("WES_BASE"), wesId.strip())) as response:
-                data = await response.json()
+                data = []
+
+                try:
+                    data = await response.json()
+                except:
+                    print("Request failed for runId: ", wesId.strip())  
+
+                # skip any corrupted runs
+                if data.get("request", None) is None:
+                    return False
                 
+                # return only data for workflow we're interested in
                 if data["request"]["workflow_url"] == workflow_url:
                     return transform_func(data)
                 else:
@@ -67,10 +77,9 @@ class Wes:
         async with semaphore:
             async with aiohttp.ClientSession() as session:
                 print("Starting new job for analysisId: ", request)
-                print(request.data())
 
-                # async with session.post(os.getenv("WES_BASE"), json=request.data()) as response:
-                #     data = await response.json()
-                #     print("New run started with runId: ", data["run_id"])
-                #     # return format for easy write into sheets as column
-                #     return [data["run_id"]]
+                async with session.post(os.getenv("WES_BASE"), json=request.data()) as response:
+                    data = await response.json()
+                    print("New run started with runId: ", data["run_id"])
+                    # return format for easy write into sheets as column
+                    return [data["run_id"]]
