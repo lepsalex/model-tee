@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from service.sheets import Sheet
+from service.Sheet import Sheet
 from dotenv import load_dotenv
 import pandas as pd
 from pandas import json_normalize

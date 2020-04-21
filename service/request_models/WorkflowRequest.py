@@ -1,11 +1,21 @@
+import os
 from abc import ABC, abstractmethod
 
 
 class WorkflowRequest(ABC):
-    def __init__(self, workflow_url, config=None):
+    def __init__(self, workflow_url, run_config=None):
+        self.song_score_config = {
+            "SONG_URL": os.getenv("SONG_URL"),
+            "SCORE_URL": os.getenv("SCORE_URL"),
+            "INTERMEDIATE_SONG_URL": os.getenv("INTERMEDIATE_SONG_URL"),
+            "ICGC_SCORE_URL": os.getenv("ICGC_SCORE_URL"),
+            "SONG_API_TOKEN": os.getenv("SONG_API_TOKEN"),
+            "ICGC_SCORE_TOKEN": os.getenv("ICGC_SCORE_API_TOKEN")
+        }
+
         self.workflow_url = workflow_url
-        self.wp_config = self.buildParams(config)
-        self.wep_config = self.__buildEngineParams(config)
+        self.wp_config = self.buildWorkflowParams(run_config, self.song_score_config)
+        self.wep_config = WorkflowRequest.buildEngineParams(run_config)
 
     def data(self):
         """
@@ -21,33 +31,35 @@ class WorkflowRequest(ABC):
         return data
 
     @abstractmethod
-    def buildParams(self, config):
+    def buildWorkflowParams(self, run_config, song_score_config):
         pass
 
-    def __buildEngineParams(self, config):
+    @classmethod
+    def buildEngineParams(cls, run_config):
         # return None of not specified
-        if config == None:
+        if run_config == None:
             return None
 
         engine_params = {}
 
-        WorkflowRequest.addFormattedStringValueIfValue(engine_params, "launch_dir", "/{}/launch", config.get("work_dir", None))
-        WorkflowRequest.addFormattedStringValueIfValue(engine_params, "project_dir", "/{}/project", config.get("work_dir", None))
-        WorkflowRequest.addFormattedStringValueIfValue(engine_params, "work_dir", "/{}/work", config.get("work_dir", None))
+        WorkflowRequest.addFormattedStringValueIfValue(engine_params, "launch_dir", "/{}/launch", run_config.get("work_dir", None))
+        WorkflowRequest.addFormattedStringValueIfValue(engine_params, "project_dir", "/{}/project", run_config.get("work_dir", None))
+        WorkflowRequest.addFormattedStringValueIfValue(engine_params, "work_dir", "/{}/work", run_config.get("work_dir", None))
 
-        WorkflowRequest.addValueIfValue(engine_params, "revision", config.get("revision", None))
+        WorkflowRequest.addValueIfValue(engine_params, "revision", run_config.get("revision", None))
+        WorkflowRequest.addValueIfValue(engine_params, "resume", run_config.get("resume", None))
 
         return engine_params
 
-    @staticmethod
-    def addValueIfValue(dict, key, val):
+    @classmethod
+    def addValueIfValue(cls, dict, key, val):
         if not val:
             return
 
         dict[key] = val
 
-    @staticmethod
-    def addFormattedStringValueIfValue(dict, key, formatted, val):
+    @classmethod
+    def addFormattedStringValueIfValue(cls, dict, key, formatted, val):
         if not val:
             return
 

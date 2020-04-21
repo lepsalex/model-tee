@@ -1,12 +1,8 @@
 import os
-import json
-import requests
-import aiohttp
-import asyncio
 import pandas as pd
 from time import sleep
 from abc import ABC, abstractmethod
-from service.sheets import Sheet
+from service.Sheet import Sheet
 from service.Wes import Wes
 
 
@@ -16,6 +12,8 @@ class WorkflowBase(ABC):
     ALREADY_RAN = ["COMPLETE", "SYSTEM_ERROR", "EXECUTOR_ERROR", "UNKNOWN"]
 
     def __init__(self, config):
+        print("Workflow init for wf_url: ", config["wf_url"])
+
         # config
         self.sheet_id = config["sheet_id"]
         self.sheet_range = config["sheet_range"]
@@ -31,9 +29,8 @@ class WorkflowBase(ABC):
         self.sheet = Sheet(self.sheet_id)
         self.sheet_data = self.sheet.read(self.sheet_range)
 
-    @classmethod
     @abstractmethod
-    def transformRunData(cls, data):
+    def transformRunData(self, data):
         """
         Defines how to parse wes response data for this workflow.
         Must be implemented, called from fetchWesRun()
@@ -49,14 +46,15 @@ class WorkflowBase(ABC):
         pass
 
     @abstractmethod
-    def buildRunParams(self, data):
+    def buildRunRequests(self, run):
         """
-        Method that creates a list of parameter dictionaries,
-        each entry representing the params for a new run
+        Must return instance of WorkflowRequest derived class
         """
         pass
 
     def run(self):
+        self.__printStartScreen()
+
         # get latest run info for sheet data
         self.sheet_data = self.__updateSheetWithWesData()
 
@@ -69,14 +67,18 @@ class WorkflowBase(ABC):
             print("Starting new jobs if NFS available ...")
             self.__startJobsOnEmptyNFS(run_availability)
 
-            # Update again (after 20 second delay)
-            self.__printSleepForN(20)
+            # Update again (after 30 second delay)
+            self.__printSleepForN(30)
             self.sheet_data = self.__updateSheetWithWesData()
         else:
             print("WES currently at max run capacity ({})".format(self.max_runs))
 
+        # Write sheet
+        print("Writing sheet data to Google Sheets ...")
+        # sheet.write(self.sheet_range, self.sheet_data)
+
     def __updateSheetWithWesData(self):
-        runs = Wes.fetchWesRunsAsDataframeForWorkflow(self.wf_url, WorkflowBase.transformRunData)
+        runs = Wes.fetchWesRunsAsDataframeForWorkflow(self.wf_url, self.transformRunData)
 
         # if we don't have any runs exit
         if runs.size == 0:
@@ -89,7 +91,7 @@ class WorkflowBase(ABC):
         """
         Compute job availability (ALIGN_MAX_RUNS - Current Running Jobs)
         """
-        current_run_count = self.sheet_data.groupby("state")["state"].count().get("RUNNING", 0) # too magic
+        current_run_count = self.sheet_data.groupby("state")["state"].count().get("RUNNING", 0)  # too magic
         return int(self.max_runs) - int(current_run_count)
 
     def __startJobsOnEmptyNFS(self, run_availability):
@@ -112,14 +114,41 @@ class WorkflowBase(ABC):
         next_runs = eligible_analyses.groupby("work_dir").first().reset_index()
         next_runs = next_runs.sample(min(run_availability, next_runs.shape[0]))
 
-        # build run params (iterrows returns tuple, [1] is where the data is)
-        params = [self.buildRunParams(next_run[1]) for next_run in next_runs.iterrows()]
+        # build run requests (iterrows returns tuple, [1] is where the data is)
+        requests = [self.buildRunRequests(next_run[1]) for next_run in next_runs.iterrows()]
+
+        Wes.startWesRuns(requests)
 
     def __printSleepForN(self, n=10):
         print("Sleep for {} ...".format(n))
         for x in reversed(range(n)):
             print("."[0:1]*min(x, 9), x)
             sleep(1)
+
+    @classmethod
+    def __printStartScreen(cls):
+        print("\nModel T roll out!")
+        
+        logo_gram = [
+            "\n",
+            "██──▀██▀▀▀██▀──██",
+            "█▀█▄──▀█▄█▀──▄█▀█",
+            "██▄▀█▄──▀──▄█▀▄██",
+            "█▄▀█▄█─█▄█─█▄█▀▄█",
+            "─▀█▄██─███─██▄█▀─",
+            "█──────▐█▌──────█",
+            "██▌─▄█─███─█▄─▐██",
+            "██▌▐██─▀▀▀─██▌▐██",
+            "██▌▐█████████▌▐█▀",
+            "▀█▌▐██─▄▄▄─██▌▐█─",
+            "─▀──█▌▐███▌▐█──▀─",
+            "──────█████──────",
+            "\n"
+        ]
+
+        for line in logo_gram:
+            print(line)
+            sleep(0.7)
 
     @classmethod
     def processTasks(cls, task):

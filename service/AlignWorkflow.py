@@ -2,13 +2,14 @@ import pandas as pd
 from service.WorkflowBase import WorkflowBase
 from service.request_models.AlignRequest import AlignRequest
 
+
 class AlignWorkflow(WorkflowBase):
 
     def __init__(self, config):
         super().__init__(config)
 
     @classmethod
-    def transformRunData(cls, data):
+    def transformRunData(self, data):
         return {
             "analysis_id": data["request"]["workflow_params"]["analysis_id"],
             "run_id": data["run_id"],
@@ -17,7 +18,7 @@ class AlignWorkflow(WorkflowBase):
             "start": data["run_log"]["start_time"],
             "end": data["run_log"]["end_time"],
             "duration": data["run_log"]["duration"],
-            "tasks": list(filter(None, map(cls.processTasks, data["task_logs"])))
+            "tasks": list(filter(None, map(self.processTasks, data["task_logs"])))
         }
 
     def mergeRunsWithSheetData(self, runs):
@@ -31,10 +32,13 @@ class AlignWorkflow(WorkflowBase):
 
         return new_sheet_data.drop(["state_y", "state_x", "run_id_x", "run_id_y"], axis=1)
 
-    def buildRunParams(self, run):
+    def buildRunRequests(self, run):
         config = {
-            "work_dir": run["work_dir"]
+            "study_id": run["study_id"],
+            "analysis_id": run["analysis_id"],
+            "work_dir": run["work_dir"],
+            "max_cpus": int(self.max_cpus),
+            "min_mem": 20,
         }
 
-        alignRequest = AlignRequest(self.wf_url, config)
-        print(alignRequest.data())
+        return AlignRequest(self.wf_url, config)

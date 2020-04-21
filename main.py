@@ -28,30 +28,17 @@ align_workflow.run()
 #     "max_cpus": os.getenv("SANGER_CPUS")
 # })
 
-# sanger_workflow.updateSheetWithWesData()
 
-# # The ID and range of the spreadsheet.
-# SPREADSHEET_ID = os.getenv("ALIGN_SHEET_ID")
+# Message function to run on every message from Kafka on defined topic
+def onMessageFunc(message):
+    print("Workflow event received ... applying filter ...")
 
-# # Init Spreadsheet
-# print("Getting sheet ...")
-# sheet = Sheet(SPREADSHEET_ID)
-
-# # run once on startup
-# modelTee(sheet)
-
-# # Message function to run on every message from Kafka on defined topic
-# def onMessageFunc(message):
-#     print("Workflow event received ... applying filter ...")
-
-#     if message.value["event"] == "completed":
-#         print("\nModel T roll out!")
-#         printStartScreen()
-#         modelTee(sheet)
-#     else:
-#         print("Event does not pass filter!")
+    if message.value["event"] == "completed":
+        align_workflow.run()
+    else:
+        print("Event does not pass filter!")
 
 
-# # subscribe to workflow events and run on
-# print("Waiting for workflow events ...")
-# consumeTopicWith(onMessageFunc)
+# subscribe to workflow events and run on
+print("Waiting for workflow events ...")
+consumeTopicWith(onMessageFunc)
