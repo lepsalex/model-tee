@@ -1,6 +1,6 @@
 import pandas as pd
 from service.WorkflowBase import WorkflowBase
-
+from service.request_models.AlignRequest import AlignRequest
 
 class AlignWorkflow(WorkflowBase):
 
@@ -30,5 +30,10 @@ class AlignWorkflow(WorkflowBase):
 
         return new_sheet_data.drop(["state_y", "state_x", "run_id_x", "run_id_y"], axis=1)
 
-    def computeNewRunParams(self, run):
-        print(run)
+    def buildRunParams(self, run):
+        config = {
+            "work_dir": run["work_dir"]
+        }
+
+        alignRequest = AlignRequest(self.wf_url, config)
+        print(alignRequest.data())
