@@ -7,6 +7,7 @@ import pandas as pd
 from time import sleep
 from abc import ABC, abstractmethod
 from service.sheets import Sheet
+from service.Wes import Wes
 
 
 class WorkflowBase(ABC):
@@ -30,8 +31,9 @@ class WorkflowBase(ABC):
         self.sheet = Sheet(self.sheet_id)
         self.sheet_data = self.sheet.read(self.sheet_range)
 
+    @classmethod
     @abstractmethod
-    def formatRunData(self, data):
+    def transformRunData(cls, data):
         """
         Defines how to parse wes response data for this workflow.
         Must be implemented, called from fetchWesRun()
@@ -74,7 +76,7 @@ class WorkflowBase(ABC):
             print("WES currently at max run capacity ({})".format(self.max_runs))
 
     def __updateSheetWithWesData(self):
-        runs = self.__fetchWesRunsAsDataframe()
+        runs = Wes.fetchWesRunsAsDataframeForWorkflow(self.wf_url, WorkflowBase.transformRunData)
 
         # if we don't have any runs exit
         if runs.size == 0:
@@ -82,45 +84,6 @@ class WorkflowBase(ABC):
             return self.sheet_data
 
         return self.mergeRunsWithSheetData(runs)
-
-    def __fetchWesRunsAsDataframe(self):
-        try:
-            # get runIds from WES (can throw ValueError on no runs)
-            runIds = self.__fetchWesRunIds()
-
-            # get data for runs belonging to this workflow
-            loop = asyncio.get_event_loop()
-            coroutines = [self.__fetchWesRun(runId) for runId in runIds]
-            runs = [run for run in loop.run_until_complete(asyncio.gather(*coroutines)) if run]
-
-            return pd.DataFrame(runs)
-        except ValueError as err:
-            # log error and return empty dataframe
-            print(err)
-            return pd.DataFrame()
-
-    def __fetchWesRunIds(self):
-        data = requests.get(os.getenv("WES_BASE")).json()
-        run_ids = [run["run_id"] for run in data["runs"]]
-
-        if len(run_ids) == 0:
-            raise ValueError("No runs exist in WES!")
-
-        return run_ids
-
-    async def __fetchWesRun(self, wesId):
-        """
-        Returns a run only if it is for this workflow,
-        otherwise returns False
-        """
-        async with aiohttp.ClientSession() as session:
-            async with session.get("{}/{}".format(os.getenv("WES_BASE"), wesId.strip())) as response:
-                data = await response.json()
-
-                if data["request"]["workflow_url"] == self.wf_url:
-                    return self.formatRunData(data)
-                else:
-                    return False
 
     def __computeRunAvailability(self):
         """
@@ -158,7 +121,8 @@ class WorkflowBase(ABC):
             print("."[0:1]*min(x, 9), x)
             sleep(1)
 
-    def processTasks(self, task):
+    @classmethod
+    def processTasks(cls, task):
         """
         Tasks are universal between workflows for our purposed,
         this utility method can be called by any implementing

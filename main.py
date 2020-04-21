@@ -1,10 +1,7 @@
 import os
 from kafka import KafkaConsumer
-from service.AlignWorkflow import AlignWorkflow
-from service.sheets import Sheet
-from service.tee import modelTee, printStartScreen
 from service.kafka import consumeTopicWith
-from time import sleep
+from service.AlignWorkflow import AlignWorkflow
 from dotenv import load_dotenv
 
 # load env from file if present

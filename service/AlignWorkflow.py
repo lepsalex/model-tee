@@ -7,7 +7,8 @@ class AlignWorkflow(WorkflowBase):
     def __init__(self, config):
         super().__init__(config)
 
-    def formatRunData(self, data):
+    @classmethod
+    def transformRunData(cls, data):
         return {
             "analysis_id": data["request"]["workflow_params"]["analysis_id"],
             "run_id": data["run_id"],
@@ -16,7 +17,7 @@ class AlignWorkflow(WorkflowBase):
             "start": data["run_log"]["start_time"],
             "end": data["run_log"]["end_time"],
             "duration": data["run_log"]["duration"],
-            "tasks": list(filter(None, map(self.processTasks, data["task_logs"])))
+            "tasks": list(filter(None, map(cls.processTasks, data["task_logs"])))
         }
 
     def mergeRunsWithSheetData(self, runs):
