@@ -17,6 +17,7 @@ align_workflow = AlignWorkflow({
     "max_cpus": os.getenv("ALIGN_CPUS")
 })
 
+# run on start
 align_workflow.run()
 
 
