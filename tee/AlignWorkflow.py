@@ -9,7 +9,7 @@ class AlignWorkflow(WorkflowBase):
         super().__init__(config)
 
     @classmethod
-    def transformRunData(self, data):
+    def transformRunData(cls, data):
         return {
             "analysis_id": data["request"]["workflow_params"]["analysis_id"],
             "run_id": data["run_id"],
@@ -17,8 +17,8 @@ class AlignWorkflow(WorkflowBase):
             "params": data["request"]["workflow_params"],
             "start": data["run_log"]["start_time"],
             "end": data["run_log"]["end_time"],
-            "duration": round(data["run_log"]["duration"] / 1000 / 60 / 60, 2),
-            "tasks": list(filter(None, map(self.processTasks, data["task_logs"])))
+            "duration": round(data["run_log"]["duration"] / 1000 / 60 / 60, 2) if data["run_log"]["duration"] and data["run_log"]["duration"] != 0 else None,
+            "tasks": list(filter(None, map(cls.processTasks, data["task_logs"])))
         }
 
     def mergeRunsWithSheetData(self, runs):
