@@ -53,12 +53,12 @@ class Wes:
                 try:
                     data = await response.json()
                 except:
-                    print("Request failed for runId: ", wesId.strip())  
+                    print("Request failed for runId: ", wesId.strip())
 
                 # skip any corrupted runs
                 if data.get("request", None) is None:
                     return False
-                
+
                 # return only data for workflow we're interested in
                 if data["request"]["workflow_url"] == workflow_url:
                     return transform_func(data)

@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from time import sleep
 from abc import ABC, abstractmethod
-from service.Sheet import Sheet
+from repository.Sheet import Sheet
 from service.Wes import Wes
 
 

@@ -1,4 +1,4 @@
-from service.request_models.WorkflowRequest import WorkflowRequest
+from tee.model.WorkflowRequest import WorkflowRequest
 
 
 class AlignRequest(WorkflowRequest):

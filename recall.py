@@ -1,5 +1,5 @@
 import os
-from service.AlignWorkflow import AlignWorkflow
+from tee.AlignWorkflow import AlignWorkflow
 from dotenv import load_dotenv
 
 # load env from file if present

@@ -1,7 +1,7 @@
 import os
 from kafka import KafkaConsumer
-from service.kafka import consumeTopicWith
-from service.AlignWorkflow import AlignWorkflow
+from service.Kafka import Kafka
+from tee.AlignWorkflow import AlignWorkflow
 from dotenv import load_dotenv
 
 # load env from file if present
@@ -41,4 +41,4 @@ align_workflow.run(quick=True)
 
 # # subscribe to workflow events and run on
 # print("Waiting for workflow events ...")
-# consumeTopicWith(onMessageFunc)
+# Kafka.consumeTopicWith(onMessageFunc)

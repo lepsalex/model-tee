@@ -1,6 +1,6 @@
 import pandas as pd
-from service.WorkflowBase import WorkflowBase
-from service.request_models.AlignRequest import AlignRequest
+from tee.WorkflowBase import WorkflowBase
+from tee.model.AlignRequest import AlignRequest
 
 
 class AlignWorkflow(WorkflowBase):
