@@ -17,28 +17,19 @@ align_workflow = AlignWorkflow({
     "max_cpus": os.getenv("ALIGN_CPUS")
 })
 
-align_workflow.run(quick=True)
-
-# sanger_workflow = AlignWorkflow({
-#     "sheet_id": os.getenv("SANGER_SHEET_ID"),
-#     "sheet_range": os.getenv("SANGER_SHEET_RANGE"),
-#     "wf_url": os.getenv("SANGER_WF_URL"),
-#     "wf_version": os.getenv("SANGER_WF_VERSION"),
-#     "max_runs": os.getenv("SANGER_MAX_RUNS"),
-#     "max_cpus": os.getenv("SANGER_CPUS")
-# })
+align_workflow.run()
 
 
-# # Message function to run on every message from Kafka on defined topic
-# def onMessageFunc(message):
-#     print("Workflow event received ... applying filter ...")
+# Message function to run on every message from Kafka on defined topic
+def onMessageFunc(message):
+    print("Workflow event received ... applying filter ...")
 
-#     if message.value["event"] == "completed":
-#         align_workflow.run()
-#     else:
-#         print("Event does not pass filter!")
+    if message.value["event"] == "completed":
+        align_workflow.run()
+    else:
+        print("Event does not pass filter!")
 
 
-# # subscribe to workflow events and run on
-# print("Waiting for workflow events ...")
-# Kafka.consumeTopicWith(onMessageFunc)
+# subscribe to workflow events and run on
+print("Waiting for workflow events ...")
+Kafka.consumeTopicWith(onMessageFunc)
