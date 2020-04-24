@@ -46,7 +46,7 @@ class WorkflowBase(ABC):
         pass
 
     @abstractmethod
-    def buildRunRequests(self, run):
+    def buildRunRequests(self, run, resume):
         """
         Must return instance of WorkflowRequest derived class
         """
@@ -136,7 +136,7 @@ class WorkflowBase(ABC):
         next_runs = next_runs.sample(min(run_availability, next_runs.shape[0]))
 
         # build run requests (iterrows returns tuple, [1] is where the data is)
-        requests = [self.buildRunRequests(next_run[1]) for next_run in next_runs.iterrows()]
+        requests = [self.buildRunRequests(next_run[1], resume=False) for next_run in next_runs.iterrows()]
 
         Wes.startWesRuns(requests)
 
