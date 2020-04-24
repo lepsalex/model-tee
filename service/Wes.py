@@ -48,18 +48,19 @@ class Wes:
         """
         async with aiohttp.ClientSession() as session:
             async with session.get("{}/{}".format(os.getenv("WES_BASE"), wesId.strip())) as response:
-                data = False
+                data = {}
 
-                # in the event that a run_id doesn't have real data (buggy)
                 try:
                     data = await response.json()
-                except Exception as ex:
+                except:
                     print("Request failed for runId: ", wesId.strip())
-                    print(ex)
-                    data = False
+
+                # in the event that a run_id doesn't have real data (buggy)
+                if data.get("request", None) is None:
+                    return False
 
                 # return only data for workflow we're interested in
-                if data and data["request"]["workflow_url"] == workflow_url:
+                if data["request"]["workflow_url"] == workflow_url:
                     return transform_func(data)
                 else:
                     return False
