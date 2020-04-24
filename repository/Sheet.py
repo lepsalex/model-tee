@@ -8,11 +8,11 @@ from google.oauth2 import service_account
 
 class Sheet:
 
-    SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-    AUTH_REDIRECT_URL = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost")
-    STORAGE_ROOT = os.getenv("STORAGE_ROOT", './static')
-
     def __init__(self, spreadsheet_id):
+        self.SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+        self.AUTH_REDIRECT_URL = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost")
+        self.STORAGE_ROOT = os.getenv("STORAGE_ROOT", './static')
+
         # Create credentials.json file
         creds_fp = self.createCredentialsFile("{}/credentials.json".format(self.STORAGE_ROOT))
 
