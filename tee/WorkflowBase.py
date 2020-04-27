@@ -135,10 +135,12 @@ class WorkflowBase(ABC):
         next_runs = eligible_analyses.groupby("work_dir").first().reset_index()
         next_runs = next_runs.sample(min(run_availability, next_runs.shape[0]))
 
-        # build run requests (iterrows returns tuple, [1] is where the data is)
-        requests = [self.buildRunRequests(next_run[1], resume=False) for next_run in next_runs.iterrows()]
+        print(next_runs)
 
-        Wes.startWesRuns(requests)
+        # build run requests (iterrows returns tuple, [1] is where the data is)
+        # requests = [self.buildRunRequests(next_run[1], resume=False) for next_run in next_runs.iterrows()]
+
+        # Wes.startWesRuns(requests)
 
     def __printSleepForN(self, n=10):
         print("Sleep for {} ...".format(n))
