@@ -28,6 +28,8 @@ class WorkflowBase(ABC):
         # initial state
         self.sheet = Sheet(self.sheet_id)
         self.sheet_data = self.sheet.read(self.sheet_range)
+        self.run_count = 0
+        self.work_dirs_in_use = []
 
     @abstractmethod
     def transformRunData(self, data):
@@ -52,7 +54,7 @@ class WorkflowBase(ABC):
         """
         pass
 
-    def run(self, quick = False):
+    def run(self, quick = False, global_run_count = 0, global_work_dirs_in_use = []):
 
         # Print logogram if not in quick mode
         if not quick:
@@ -62,23 +64,27 @@ class WorkflowBase(ABC):
         self.sheet_data = self.__updateSheetWithWesData()
 
         # Compute job availability
-        run_availability = self.__computeRunAvailability()
+        run_availability = self.__computeRunAvailability(global_run_count)
 
         # Start new jobs if there is room
         if (run_availability > 0):
             # Start jobs if possible
             print("Starting new jobs if NFS available ...")
-            self.__startJobsOnEmptyNFS(run_availability)
+            self.__startJobsOnEmptyNFS(run_availability, global_work_dirs_in_use)
 
             # Update again (after 30 second delay)
-            self.__printSleepForN(30)
+            # self.__printSleepForN(30)
             self.sheet_data = self.__updateSheetWithWesData()
         else:
             print("WES currently at max run capacity ({})".format(self.max_runs))
 
-        # Write sheet
-        print("Writing sheet data to Google Sheets ...")
-        self.sheet.write(self.sheet_range, self.sheet_data)
+        # Update state
+        self.run_count = self.__getCurrentRunCount()
+        self.work_dirs_in_use = self.__getWorkdirsInUse()
+
+        # # Write sheet
+        # print("Writing sheet data to Google Sheets ...")
+        # self.sheet.write(self.sheet_range, self.sheet_data)
 
     def recall(self, run_ids):
         # get latest run info for sheet data
@@ -98,6 +104,22 @@ class WorkflowBase(ABC):
         print("Writing sheet data to Google Sheets ...")
         self.sheet.write(self.sheet_range, sheet_data)
 
+    @property
+    def run_count(self):
+        return self.__run_count
+
+    @property
+    def work_dirs_in_use(self):
+        return self.__work_dirs_in_use
+
+    @run_count.setter
+    def run_count(self, run_count):
+        self.__run_count = run_count
+
+    @work_dirs_in_use.setter
+    def work_dirs_in_use(self, work_dirs_in_use):
+        self.__work_dirs_in_use = work_dirs_in_use
+
     def __updateSheetWithWesData(self):
         runs = Wes.fetchWesRunsAsDataframeForWorkflow(self.wf_url, self.transformRunData)
 
@@ -108,19 +130,30 @@ class WorkflowBase(ABC):
 
         return self.mergeRunsWithSheetData(runs)
 
-    def __computeRunAvailability(self):
+    def __getCurrentRunCount(self):
         """
-        Compute job availability (ALIGN_MAX_RUNS - Current Running Jobs)
+        Get count of currently running jobs for THIS workflow
         """
-        current_run_count = self.sheet_data.groupby("state")["state"].count().get("RUNNING", 0)  # too magic
-        return int(self.max_runs) - int(current_run_count)
+        return self.sheet_data.groupby("state")["state"].count().get("RUNNING", 0) 
 
-    def __startJobsOnEmptyNFS(self, run_availability):
-        # check directories that are in use
+    def __computeRunAvailability(self, global_run_count):
+        """
+        Compute job availability (ALIGN_MAX_RUNS - Current Running Jobs (__getCurrentRunCount))
+        """
+        return int(self.max_runs) - (int(self.__getCurrentRunCount()) + global_run_count)
+
+    def __getWorkdirsInUse(self):
+        return self.sheet_data[self.sheet_data["state"] == "RUNNING"]["work_dir"].values
+
+    def __startJobsOnEmptyNFS(self, run_availability, global_work_dirs_in_use = []):
+        # check directories that are in use for this workflow
         not_schedulable_work_dirs = self.sheet_data.loc[self.sheet_data["state"].isin(self.NOT_SCHEDULABLE)].groupby(["work_dir"])
 
+        # combine with globally used work_dirs (if any)
+        not_schedulable_work_dirs = set(list(not_schedulable_work_dirs.groups.keys()) + global_work_dirs_in_use)
+
         # filter available directories (set of all dirs minus dirs in use + tainted dirs from env)
-        unavailable_dir = {y for x in [not_schedulable_work_dirs.groups.keys(), self.tainted_dir_list] for y in x if y}
+        unavailable_dir = {y for x in [not_schedulable_work_dirs, self.tainted_dir_list] for y in x if y}
         eligible_workdirs = self.sheet_data.loc[~self.sheet_data["work_dir"].isin(unavailable_dir)]
 
         # filter out any analyses that have already been completed
