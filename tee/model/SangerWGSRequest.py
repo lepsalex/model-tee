@@ -33,20 +33,7 @@ class SangerWGSRequest(WorkflowRequestBase):
                 "cpus": 6,
                 "mem": 8
             },
-            "generate-bas": {
-                "cpus": 6,
-                "mem": 8
-            },
             "sangerWgsVariantCaller": {
-                "cpus": 12,
-                "mem": 108,
-                "ref_genome_tar": "/{}/reference/sanger-variant-calling/core_ref_GRCh38_hla_decoy_ebv.tar.gz".format(work_dir),
-                "vagrent_annot": "/{}/reference/sanger-variant-calling/VAGrENT_ref_GRCh38_hla_decoy_ebv_ensembl_91.tar.gz".format(work_dir),
-                "ref_snv_indel_tar": "/{}/reference/sanger-variant-calling/SNV_INDEL_ref_GRCh38_hla_decoy_ebv-fragment.tar.gz".format(work_dir),
-                "ref_cnv_sv_tar": "/{}/reference/sanger-variant-calling/CNV_SV_ref_GRCh38_hla_decoy_ebv_brass6+.tar.gz".format(work_dir),
-                "qcset_tar": "/{}/reference/sanger-variant-calling/qcGenotype_GRCh38_hla_decoy_ebv.tar.gz".format(work_dir)
-            },
-            "sanger-wgs-variant-caller": {
                 "cpus": 12,
                 "mem": 108,
                 "ref_genome_tar": "/{}/reference/sanger-variant-calling/core_ref_GRCh38_hla_decoy_ebv.tar.gz".format(work_dir),
@@ -59,15 +46,7 @@ class SangerWGSRequest(WorkflowRequestBase):
                 "cpus": 2,
                 "mem": 4
             },
-            "repack-sanger-results": {
-                "cpus": 2,
-                "mem": 4
-            },
             "prepSangerSupplement": {
-                "cpus": 2,
-                "mem": 8
-            },
-            "prep-sanger-supplement": {
                 "cpus": 2,
                 "mem": 8
             },
@@ -75,15 +54,7 @@ class SangerWGSRequest(WorkflowRequestBase):
                 "cpus": 2,
                 "mem": 16
             },
-            "caveman-vcf-fix": {
-                "cpus": 2,
-                "mem": 16
-            },
             "extractSangerCall": {
-                "cpus": 2,
-                "mem": 4
-            },
-            "extract-sanger-call": {
                 "cpus": 2,
                 "mem": 4
             },
@@ -91,15 +62,7 @@ class SangerWGSRequest(WorkflowRequestBase):
                 "cpus": 2,
                 "mem": 8
             },
-            "payload-gen-variant-call": {
-                "cpus": 2,
-                "mem": 8
-            },
             "prepSangerQc": {
-                "cpus": 2,
-                "mem": 8
-            },
-            "prep-sanger-qc": {
                 "cpus": 2,
                 "mem": 8
             },
