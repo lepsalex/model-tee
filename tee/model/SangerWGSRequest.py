@@ -7,8 +7,8 @@ class SangerWGSRequest(WorkflowRequestBase):
 
     def buildWorkflowParams(self, run_config, song_score_config):
         study_id = run_config["study_id"]
-        normal_aln_analysis_id = run_config["normal_aln_analysis_id"],
-        tumour_aln_analysis_id = run_config["tumour_aln_analysis_id"],
+        normal_aln_analysis_id = run_config["normal_aln_analysis_id"]
+        tumour_aln_analysis_id = run_config["tumour_aln_analysis_id"]
         work_dir = run_config["work_dir"]
         cpus = run_config["max_cpus"]
         mem = max((cpus * 3) + 2, run_config["min_mem"])
@@ -122,4 +122,4 @@ class SangerWGSRequest(WorkflowRequestBase):
         """
         Represent and request against combo of normal_aln_analysis_id and tumour_aln_analysis_id
         """
-        return "{}-{}".format(self.wp_config["normal_aln_analysis_id"], self.wp_config["tumour_aln_analysis_id"])
+        return "normal: {} - tumor: {}".format(self.wp_config["normal_aln_analysis_id"], self.wp_config["tumour_aln_analysis_id"])
