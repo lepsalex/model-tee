@@ -29,8 +29,8 @@ class WorkflowBase(ABC):
         # initial state
         self.sheet = Sheet(self.sheet_id)
         self.sheet_data = self.sheet.read(self.sheet_range)
-        self.run_count = 0
-        self.work_dirs_in_use = []
+        self.run_count = self.__getCurrentRunCount()
+        self.work_dirs_in_use = self.__getWorkdirsInUse()
 
     @abstractmethod
     def transformRunData(self, data):
