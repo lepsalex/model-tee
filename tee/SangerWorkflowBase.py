@@ -28,11 +28,12 @@ class SangerWorkflowBase(WorkflowBase):
         # Update sheet data
         new_sheet_data = pd.merge(self.sheet_data, latest_runs[["normal_aln_analysis_id", "tumour_aln_analysis_id", "run_id", "state", "start", "end", "duration"]], on=[
                                   "normal_aln_analysis_id", "tumour_aln_analysis_id"], how="left")
-        new_sheet_data["run_id"] = new_sheet_data["run_id_y"].fillna(new_sheet_data["run_id_x"])
-        new_sheet_data["state"] = new_sheet_data["state_y"].fillna(new_sheet_data["state_x"])
-        new_sheet_data["start"] = new_sheet_data["start_y"].fillna(new_sheet_data["start_x"])
-        new_sheet_data["end"] = new_sheet_data["end_y"].fillna(new_sheet_data["end_x"])
-        new_sheet_data["duration"] = new_sheet_data["duration_y"].fillna(new_sheet_data["duration_x"])
+
+        new_sheet_data["run_id"] = new_sheet_data["run_id_y"].fillna(new_sheet_data["run_id_x"]).fillna("")
+        new_sheet_data["state"] = new_sheet_data["state_y"].fillna(new_sheet_data["state_x"]).fillna("")
+        new_sheet_data["start"] = new_sheet_data["start_y"].fillna(new_sheet_data["start_x"]).fillna("")
+        new_sheet_data["end"] = new_sheet_data["end_y"].fillna(new_sheet_data["end_x"]).fillna("")
+        new_sheet_data["duration"] = new_sheet_data["duration_y"].fillna(new_sheet_data["duration_x"]).fillna("")
 
         return new_sheet_data.drop([
             "run_id_x",
