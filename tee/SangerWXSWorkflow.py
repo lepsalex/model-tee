@@ -3,7 +3,7 @@ from tee.SangerWorkflowBase import SangerWorkflowBase
 from tee.model.AlignRequest import AlignRequest
 
 
-class SangerWGSWorkflow(SangerWorkflowBase):
+class SangerWXSWorkflow(SangerWorkflowBase):
 
     def __init__(self, config):
         super().__init__(config)
