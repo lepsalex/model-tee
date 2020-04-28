@@ -1,7 +1,7 @@
 from tee.model.WorkflowRequestBase import WorkflowRequestBase
 
 
-class AlignRequest(WorkflowRequestBase):
+class SangerWXSRequest(WorkflowRequestBase):
     def __init__(self, workflow_url, config=None):
         super().__init__(workflow_url, config)
 

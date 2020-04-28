@@ -1,6 +1,6 @@
 import pandas as pd
 from tee.SangerWorkflowBase import SangerWorkflowBase
-from tee.model.AlignRequest import AlignRequest
+from tee.model.SangerWGSRequest import SangerWGSRequest
 
 
 class SangerWGSWorkflow(SangerWorkflowBase):
@@ -21,4 +21,4 @@ class SangerWGSWorkflow(SangerWorkflowBase):
         if resume:
             config["resume"] = run["run_id"]
 
-        return AlignRequest(self.wf_url, config)
+        return SangerWGSRequest(self.wf_url, config)
