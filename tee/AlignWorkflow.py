@@ -52,8 +52,8 @@ class AlignWorkflow(WorkflowBase):
             "analysis_id": run["analysis_id"],
             "work_dir": run["work_dir"],
             "revision": self.wf_version,
-            "max_cpus": int(self.max_cpus),
-            "min_mem": 20,
+            "cpus": int(self.cpus),
+            "mem": int(self.mem)
         }
 
         if resume:

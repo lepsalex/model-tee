@@ -20,7 +20,8 @@ class WorkflowBase(ABC):
         self.wf_url = config["wf_url"]
         self.wf_version = config["wf_version"]
         self.max_runs = config["max_runs"]
-        self.max_cpus = config["max_cpus"]
+        self.cpus = config["cpus"]
+        self.mem = config["mem"]
 
         # general env config (not specific to any workflow)
         self.tainted_dir_list = os.getenv("TAINTED_DIR_LIST", "").split(",")
@@ -54,7 +55,7 @@ class WorkflowBase(ABC):
         """
         pass
 
-    def run(self, quick = False, global_run_count = 0, global_work_dirs_in_use = []):
+    def run(self, quick=False, global_run_count=0, global_work_dirs_in_use=[]):
 
         # Print logogram if not in quick mode
         if not quick:
@@ -134,7 +135,7 @@ class WorkflowBase(ABC):
         """
         Get count of currently running jobs for THIS workflow
         """
-        return self.sheet_data.groupby("state")["state"].count().get("RUNNING", 0) 
+        return self.sheet_data.groupby("state")["state"].count().get("RUNNING", 0)
 
     def __computeRunAvailability(self, global_run_count):
         """
@@ -145,7 +146,7 @@ class WorkflowBase(ABC):
     def __getWorkdirsInUse(self):
         return self.sheet_data[self.sheet_data["state"] == "RUNNING"]["work_dir"].values
 
-    def __startJobsOnEmptyNFS(self, run_availability, global_work_dirs_in_use = []):
+    def __startJobsOnEmptyNFS(self, run_availability, global_work_dirs_in_use=[]):
         # check directories that are in use for this workflow
         not_schedulable_work_dirs = self.sheet_data.loc[self.sheet_data["state"].isin(self.NOT_SCHEDULABLE)].groupby(["work_dir"])
 

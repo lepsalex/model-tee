@@ -10,8 +10,8 @@ class SangerWGSRequest(WorkflowRequestBase):
         normal_aln_analysis_id = run_config["normal_aln_analysis_id"]
         tumour_aln_analysis_id = run_config["tumour_aln_analysis_id"]
         work_dir = run_config["work_dir"]
-        cpus = run_config["max_cpus"]
-        mem = max((cpus * 3) + 2, run_config["min_mem"])
+        cpus = run_config["cpus"]
+        mem = run_config["mem"]
 
         params = {
             "study_id": study_id,
@@ -29,18 +29,18 @@ class SangerWGSRequest(WorkflowRequestBase):
                 "score_cpus": 8,
                 "score_mem": 18
             },
-            "generateBas": {
-                "cpus": 6,
-                "mem": 8
-            },
             "sangerWgsVariantCaller": {
-                "cpus": 12,
-                "mem": 108,
+                "cpus": cpus,
+                "mem": mem,
                 "ref_genome_tar": "/{}/reference/sanger-variant-calling/core_ref_GRCh38_hla_decoy_ebv.tar.gz".format(work_dir),
                 "vagrent_annot": "/{}/reference/sanger-variant-calling/VAGrENT_ref_GRCh38_hla_decoy_ebv_ensembl_91.tar.gz".format(work_dir),
                 "ref_snv_indel_tar": "/{}/reference/sanger-variant-calling/SNV_INDEL_ref_GRCh38_hla_decoy_ebv-fragment.tar.gz".format(work_dir),
                 "ref_cnv_sv_tar": "/{}/reference/sanger-variant-calling/CNV_SV_ref_GRCh38_hla_decoy_ebv_brass6+.tar.gz".format(work_dir),
                 "qcset_tar": "/{}/reference/sanger-variant-calling/qcGenotype_GRCh38_hla_decoy_ebv.tar.gz".format(work_dir)
+            },
+            "generateBas": {
+                "cpus": 6,
+                "mem": 8
             },
             "repackSangerResults": {
                 "cpus": 2,
@@ -71,7 +71,8 @@ class SangerWGSRequest(WorkflowRequestBase):
                 "song_mem": 2,
                 "score_cpus": 8,
                 "score_mem": 18
-            }
+            },
+            "cleanup": True
         }
 
         if song_score_config.get("INTERMEDIATE_SONG_URL"):
