@@ -2,6 +2,8 @@ import os
 from kafka import KafkaConsumer
 from service.Kafka import Kafka
 from tee.AlignWorkflow import AlignWorkflow
+from tee.SangerWGSWorkflow import SangerWGSWorkflow
+from tee.SangerWXSWorkflow import SangerWXSWorkflow
 from dotenv import load_dotenv
 
 # load env from file if present
@@ -14,12 +16,32 @@ align_workflow = AlignWorkflow({
     "wf_url": os.getenv("ALIGN_WF_URL"),
     "wf_version": os.getenv("ALIGN_WF_VERSION"),
     "max_runs": os.getenv("ALIGN_MAX_RUNS"),
-    "max_cpus": os.getenv("ALIGN_CPUS")
+    "cpus": os.getenv("ALIGN_CPUS"),
+    "mem": os.getenv("ALIGN_MEM")
 })
+
+# sanger_wgs_workflow = SangerWGSWorkflow({
+#     "sheet_id": os.getenv("SANGER_WGS_SHEET_ID"),
+#     "sheet_range": os.getenv("SANGER_WGS_SHEET_RANGE"),
+#     "wf_url": os.getenv("SANGER_WGS_WF_URL"),
+#     "wf_version": os.getenv("SANGER_WGS_WF_VERSION"),
+#     "max_runs": os.getenv("SANGER_WGS_MAX_RUNS"),
+#     "cpus": os.getenv("SANGER_WGS_CPUS"),
+#     "mem": os.getenv("SANGER_WGS_MEM")
+# })
+
+# sanger_wxs_workflow = SangerWXSWorkflow({
+#     "sheet_id": os.getenv("SANGER_WXS_SHEET_ID"),
+#     "sheet_range": os.getenv("SANGER_WXS_SHEET_RANGE"),
+#     "wf_url": os.getenv("SANGER_WXS_WF_URL"),
+#     "wf_version": os.getenv("SANGER_WXS_WF_VERSION"),
+#     "max_runs": os.getenv("SANGER_WXS_MAX_RUNS"),
+#     "cpus": os.getenv("SANGER_WXS_CPUS"),
+#     "mem": os.getenv("SANGER_WXS_MEM")
+# })
 
 # run on start
 align_workflow.run()
-
 
 # Message function to run on every message from Kafka on defined topic
 def onMessageFunc(message):

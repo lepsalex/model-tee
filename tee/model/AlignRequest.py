@@ -1,7 +1,7 @@
-from tee.model.WorkflowRequest import WorkflowRequest
+from tee.model.WorkflowRequestBase import WorkflowRequestBase
 
 
-class AlignRequest(WorkflowRequest):
+class AlignRequest(WorkflowRequestBase):
     def __init__(self, workflow_url, config=None):
         super().__init__(workflow_url, config)
 
@@ -9,8 +9,8 @@ class AlignRequest(WorkflowRequest):
         study_id = run_config["study_id"]
         analysis_id = run_config["analysis_id"]
         work_dir = run_config["work_dir"]
-        cpus = run_config["max_cpus"]
-        mem = max((cpus * 3) + 2, run_config["min_mem"])
+        cpus = run_config["cpus"]
+        mem = max((cpus * 3) + 2, run_config["mem"])
 
         params = {
             "study_id": study_id,
