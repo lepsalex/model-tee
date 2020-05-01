@@ -32,7 +32,7 @@ class Wes:
 
     @classmethod
     def fetchWesRunIds(cls):
-        data = requests.get(os.getenv("WES_BASE")).json()
+        data = requests.get(os.getenv("WES_GQL")).json()
         run_ids = [run["run_id"] for run in data["runs"]]
 
         if len(run_ids) == 0:
@@ -47,7 +47,7 @@ class Wes:
         otherwise returns False
         """
         async with aiohttp.ClientSession() as session:
-            async with session.get("{}/{}".format(os.getenv("WES_BASE"), wesId.strip())) as response:
+            async with session.get("{}/{}".format(os.getenv("WES_GQL"), wesId.strip())) as response:
                 data = {}
 
                 try:
@@ -78,7 +78,7 @@ class Wes:
             async with aiohttp.ClientSession() as session:
                 print("Starting new job for analysisId: ", run_request)
 
-                async with session.post(os.getenv("WES_BASE"), json=run_request.data()) as response:
+                async with session.post(os.getenv("WES_RUNS_BASE"), json=run_request.data()) as response:
                     data = await response.json()
                     print("New run started with runId: ", data["run_id"])
                     # return format for easy write into sheets as column
