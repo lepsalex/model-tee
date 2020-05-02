@@ -1,4 +1,5 @@
 import pandas as pd
+from gql import gql
 from tee.WorkflowBase import WorkflowBase
 from tee.model.AlignRequest import AlignRequest
 
@@ -8,7 +9,7 @@ class AlignWorkflow(WorkflowBase):
     def __init__(self, config):
         super().__init__(config)
 
-    def transformRunData(self, data):
+    def gqlQueryBuilder(self, data):
         return {
             "analysis_id": data["request"]["workflow_params"]["analysis_id"],
             "run_id": data["run_id"],

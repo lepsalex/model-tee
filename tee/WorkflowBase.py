@@ -29,14 +29,15 @@ class WorkflowBase(ABC):
         # initial state
         self.sheet = Sheet(self.sheet_id)
         self.sheet_data = self.sheet.read(self.sheet_range)
+        self.gql_query = self.gqlQueryBuilder()
         self.run_count = self.__getCurrentRunCount()
         self.work_dirs_in_use = self.__getWorkdirsInUse()
 
     @abstractmethod
-    def transformRunData(self, data):
+    def gqlQueryBuilder(self):
         """
-        Defines how to parse wes response data for this workflow.
-        Must be implemented, called from fetchWesRun()
+        This will be called on instantiation, will
+        build the gql query for the workflow
         """
         pass
 
@@ -64,28 +65,28 @@ class WorkflowBase(ABC):
         # get latest run info for sheet data
         self.sheet_data = self.__updateSheetWithWesData()
 
-        # Compute job availability
-        run_availability = self.__computeRunAvailability(global_run_count)
+        # # Compute job availability
+        # run_availability = self.__computeRunAvailability(global_run_count)
 
-        # Start new jobs if there is room
-        if (run_availability > 0):
-            # Start jobs if possible
-            print("Starting new jobs if NFS available ...")
-            self.__startJobsOnEmptyNFS(run_availability, global_work_dirs_in_use)
+        # # Start new jobs if there is room
+        # if (run_availability > 0):
+        #     # Start jobs if possible
+        #     print("Starting new jobs if NFS available ...")
+        #     self.__startJobsOnEmptyNFS(run_availability, global_work_dirs_in_use)
 
-            # Update again (after 30 second delay)
-            self.__printSleepForN(30)
-            self.sheet_data = self.__updateSheetWithWesData()
-        else:
-            print("WES currently at max run capacity ({})".format(self.max_runs))
+        #     # Update again (after 30 second delay)
+        #     self.__printSleepForN(30)
+        #     self.sheet_data = self.__updateSheetWithWesData()
+        # else:
+        #     print("WES currently at max run capacity ({})".format(self.max_runs))
 
-        # Update state
-        self.run_count = self.__getCurrentRunCount()
-        self.work_dirs_in_use = self.__getWorkdirsInUse()
+        # # Update state
+        # self.run_count = self.__getCurrentRunCount()
+        # self.work_dirs_in_use = self.__getWorkdirsInUse()
 
-        # Write sheet
-        print("Writing sheet data to Google Sheets ...")
-        self.sheet.write(self.sheet_range, self.sheet_data)
+        # # Write sheet
+        # print("Writing sheet data to Google Sheets ...")
+        # self.sheet.write(self.sheet_range, self.sheet_data)
 
     def recall(self, run_ids):
         # get latest run info for sheet data
@@ -122,7 +123,7 @@ class WorkflowBase(ABC):
         self.__work_dirs_in_use = work_dirs_in_use
 
     def __updateSheetWithWesData(self):
-        runs = Wes.fetchWesRunsAsDataframeForWorkflow(self.wf_url, self.transformRunData)
+        runs = Wes.fetchWesRunsAsDataframeForWorkflow(self.wf_url, self.runsQuery)
 
         # if we don't have any runs exit
         if runs.size == 0:

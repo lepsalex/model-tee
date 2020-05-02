@@ -4,23 +4,32 @@ import requests
 import aiohttp
 import asyncio
 import pandas as pd
+from gql import Client
+from gql.transport.requests import RequestsHTTPTransport
 
 
 class Wes:
 
+    _transport = RequestsHTTPTransport(
+        url=os.getenv("WES_GQL"),
+        use_json=True,
+    )
+
+    client = Client(
+        transport=_transport,
+        fetch_schema_from_transport=True,
+    )
+
     @classmethod
-    def fetchWesRunsAsDataframeForWorkflow(cls, workflow_url, transform_func):
+    def fetchWesRunsAsDataframeForWorkflow(cls, workflow_url, query):
         # init to empty dataframe
         runs_df = pd.DataFrame()
 
         try:
-            # get runIds from WES (can throw ValueError on no runs)
-            runIds = cls.fetchWesRunIds()
+            # execute gql query
+            runs = cls.client.execute(query)
 
-            # get data for runs belonging to this workflow
-            loop = asyncio.get_event_loop()
-            coroutines = [cls.fetchWesRunForWf(runId, workflow_url, transform_func) for runId in runIds]
-            runs = [run for run in loop.run_until_complete(asyncio.gather(*coroutines)) if run]
+            print(runs)
 
             # create new dataframe and reassign
             runs_df = pd.DataFrame(runs)
@@ -29,41 +38,6 @@ class Wes:
             print(err)
 
         return runs_df
-
-    @classmethod
-    def fetchWesRunIds(cls):
-        data = requests.get(os.getenv("WES_GQL")).json()
-        run_ids = [run["run_id"] for run in data["runs"]]
-
-        if len(run_ids) == 0:
-            raise ValueError("No runs exist in WES!")
-
-        return run_ids
-
-    @classmethod
-    async def fetchWesRunForWf(cls, wesId, workflow_url, transform_func):
-        """
-        Returns a run only if it is for this workflow,
-        otherwise returns False
-        """
-        async with aiohttp.ClientSession() as session:
-            async with session.get("{}/{}".format(os.getenv("WES_GQL"), wesId.strip())) as response:
-                data = {}
-
-                try:
-                    data = await response.json()
-                except:
-                    print("Request failed for runId: ", wesId.strip())
-
-                # in the event that a run_id doesn't have real data (buggy)
-                if data.get("request", None) is None:
-                    return False
-
-                # return only data for workflow we're interested in
-                if data["request"]["workflow_url"] == workflow_url:
-                    return transform_func(data)
-                else:
-                    return False
 
     @classmethod
     def startWesRuns(cls, run_requests):
