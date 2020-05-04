@@ -9,7 +9,7 @@ load_dotenv(".env.prod")
 align_workflow = AlignWorkflow({
     "sheet_id": os.getenv("ALIGN_SHEET_ID"),
     "sheet_range": os.getenv("ALIGN_SHEET_RANGE"),
-    "wf_name": os.getenv("ALIGN_WF_URL"),
+    "wf_name": os.getenv("ALIGN_WF_NAME"),
     "wf_version": os.getenv("ALIGN_WF_VERSION"),
     "max_runs": os.getenv("ALIGN_MAX_RUNS"),
     "cpus": os.getenv("ALIGN_CPUS"),

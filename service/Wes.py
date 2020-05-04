@@ -6,6 +6,9 @@ import asyncio
 import pandas as pd
 from gql import Client
 from gql.transport.requests import RequestsHTTPTransport
+from dotenv import load_dotenv
+
+load_dotenv('.env.dev')
 
 
 class Wes:
@@ -21,15 +24,16 @@ class Wes:
     )
 
     @classmethod
-    def fetchWesRunsAsDataframeForWorkflow(cls, workflow_url, query):
+    def fetchWesRunsAsDataframeForWorkflow(cls, query, transform_func):
         # init to empty dataframe
         runs_df = pd.DataFrame()
 
         try:
             # execute gql query
-            runs = cls.client.execute(query)
+            response = cls.client.execute(query)
 
-            print(runs)
+            # convert gql response to something we can work with
+            runs = [transform_func(run) for run in response["runs"]]
 
             # create new dataframe and reassign
             runs_df = pd.DataFrame(runs)

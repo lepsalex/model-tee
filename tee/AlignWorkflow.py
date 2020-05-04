@@ -1,5 +1,4 @@
 import pandas as pd
-from gql import gql
 from tee.WorkflowBase import WorkflowBase
 from tee.model.AlignRequest import AlignRequest
 
@@ -9,16 +8,16 @@ class AlignWorkflow(WorkflowBase):
     def __init__(self, config):
         super().__init__(config)
 
-    def gqlQueryBuilder(self, data):
+    def transformRunData(self, data):
         return {
-            "analysis_id": data["request"]["workflow_params"]["analysis_id"],
-            "run_id": data["run_id"],
+            "analysis_id": data["parameters"]["analysis_id"],
+            "run_id": data["runId"],
             "state": data["state"],
-            "params": data["request"]["workflow_params"],
-            "start": data["run_log"]["start_time"],
-            "end": data["run_log"]["end_time"],
-            "duration": round(data["run_log"]["duration"] / 1000 / 60 / 60, 2) if data["run_log"]["duration"] and data["run_log"]["duration"] != 0 else None,
-            "tasks": list(filter(None, map(self.processTasks, data["task_logs"])))
+            "params": data["parameters"],
+            "start": data["startTime"],
+            "end": data["completeTime"],
+            "duration": round(int(data["duration"]) / 1000 / 60 / 60, 2) if data["duration"] and data["duration"] != 0 else None,
+            "tasks": data["tasks"]
         }
 
     def mergeRunsWithSheetData(self, runs):

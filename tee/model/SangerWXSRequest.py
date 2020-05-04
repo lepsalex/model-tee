@@ -2,8 +2,8 @@ from tee.model.WorkflowRequestBase import WorkflowRequestBase
 
 
 class SangerWXSRequest(WorkflowRequestBase):
-    def __init__(self, workflow_url, config=None):
-        super().__init__(workflow_url, config)
+    def __init__(self, workflow_name, config=None):
+        super().__init__(workflow_name, config)
 
     def buildWorkflowParams(self, run_config, song_score_config):
         study_id = run_config["study_id"]
