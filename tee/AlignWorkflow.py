@@ -60,4 +60,4 @@ class AlignWorkflow(WorkflowBase):
         if resume:
             config["resume"] = run["run_id"]
 
-        return AlignRequest(self.wf_url, config)
+        return AlignRequest(self.wf_name, config)

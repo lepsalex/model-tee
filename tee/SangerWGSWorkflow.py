@@ -22,4 +22,4 @@ class SangerWGSWorkflow(SangerWorkflowBase):
         if resume:
             config["resume"] = run["run_id"]
 
-        return SangerWGSRequest(self.wf_url, config)
+        return SangerWGSRequest(self.wf_name, config)

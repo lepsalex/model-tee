@@ -12,12 +12,12 @@ class WorkflowBase(ABC):
     ALREADY_RAN = ["COMPLETE", "SYSTEM_ERROR", "EXECUTOR_ERROR", "UNKNOWN"]
 
     def __init__(self, config):
-        print("Workflow init for wf_url: ", config["wf_url"])
+        print("Workflow init for wf_name: ", config["wf_name"])
 
         # config
         self.sheet_id = config["sheet_id"]
         self.sheet_range = config["sheet_range"]
-        self.wf_url = config["wf_url"]
+        self.wf_name = config["wf_name"]
         self.wf_version = config["wf_version"]
         self.max_runs = config["max_runs"]
         self.cpus = config["cpus"]
@@ -123,7 +123,7 @@ class WorkflowBase(ABC):
         self.__work_dirs_in_use = work_dirs_in_use
 
     def __updateSheetWithWesData(self):
-        runs = Wes.fetchWesRunsAsDataframeForWorkflow(self.wf_url, self.runsQuery)
+        runs = Wes.fetchWesRunsAsDataframeForWorkflow(self.wf_name, self.runsQuery)
 
         # if we don't have any runs exit
         if runs.size == 0:
