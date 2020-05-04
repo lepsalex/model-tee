@@ -13,12 +13,12 @@ class WorkflowBase(ABC):
     ALREADY_RAN = ["COMPLETE", "SYSTEM_ERROR", "EXECUTOR_ERROR", "UNKNOWN"]
 
     def __init__(self, config):
-        print("Workflow init for wf_name: ", config["wf_name"])
+        print("Workflow init for wf_url: ", config["wf_url"])
 
         # config
         self.sheet_id = config["sheet_id"]
         self.sheet_range = config["sheet_range"]
-        self.wf_name = config["wf_name"]
+        self.wf_url = config["wf_url"]
         self.wf_version = config["wf_version"]
         self.max_runs = config["max_runs"]
         self.cpus = config["cpus"]
@@ -145,7 +145,7 @@ class WorkflowBase(ABC):
                 }
             }
         }
-        ''' % self.wf_name)
+        ''' % self.wf_url)
 
     def __updateSheetWithWesData(self):
         runs = Wes.fetchWesRunsAsDataframeForWorkflow(self.gql_query, self.transformRunData)

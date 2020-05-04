@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 
 class WorkflowRequestBase(ABC):
-    def __init__(self, workflow_name, run_config=None):
+    def __init__(self, workflow_url, run_config=None):
         self.song_score_config = {
             "SONG_URL": os.getenv("SONG_URL"),
             "SCORE_URL": os.getenv("SCORE_URL"),
@@ -13,7 +13,7 @@ class WorkflowRequestBase(ABC):
             "ICGC_SCORE_TOKEN": os.getenv("ICGC_SCORE_API_TOKEN")
         }
 
-        self.workflow_name = workflow_name
+        self.workflow_url = workflow_url
         self.wp_config = self.buildWorkflowParams(run_config, self.song_score_config)
         self.wep_config = WorkflowRequestBase.buildEngineParams(run_config)
 
@@ -22,7 +22,7 @@ class WorkflowRequestBase(ABC):
         Returns WorkflowRequest in WES format as Dict
         """
         data = {
-            "workflow_url": "icgc-argo/{}".format(self.workflow_name)
+            "workflow_url": self.workflow_url
         }
 
         WorkflowRequestBase.addValueIfValue(data, "workflow_params", self.wp_config)

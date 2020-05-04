@@ -13,7 +13,7 @@ load_dotenv('.env.dev')
 align_workflow = AlignWorkflow({
     "sheet_id": os.getenv("ALIGN_SHEET_ID"),
     "sheet_range": os.getenv("ALIGN_SHEET_RANGE"),
-    "wf_name": os.getenv("ALIGN_WF_NAME"),
+    "wf_url": os.getenv("ALIGN_WF_URL"),
     "wf_version": os.getenv("ALIGN_WF_VERSION"),
     "max_runs": os.getenv("ALIGN_MAX_RUNS"),
     "cpus": os.getenv("ALIGN_CPUS"),
@@ -23,7 +23,7 @@ align_workflow = AlignWorkflow({
 # sanger_wgs_workflow = SangerWGSWorkflow({
 #     "sheet_id": os.getenv("SANGER_WGS_SHEET_ID"),
 #     "sheet_range": os.getenv("SANGER_WGS_SHEET_RANGE"),
-#     "wf_name": os.getenv("SANGER_WGS_WF_NAME"),
+#     "wf_url": os.getenv("SANGER_WGS_WF_URL"),
 #     "wf_version": os.getenv("SANGER_WGS_WF_VERSION"),
 #     "max_runs": os.getenv("SANGER_WGS_MAX_RUNS"),
 #     "cpus": os.getenv("SANGER_WGS_CPUS"),
@@ -33,7 +33,7 @@ align_workflow = AlignWorkflow({
 # sanger_wxs_workflow = SangerWXSWorkflow({
 #     "sheet_id": os.getenv("SANGER_WXS_SHEET_ID"),
 #     "sheet_range": os.getenv("SANGER_WXS_SHEET_RANGE"),
-#     "wf_name": os.getenv("SANGER_WXS_WF_NAME"),
+#     "wf_url": os.getenv("SANGER_WXS_WF_URL"),
 #     "wf_version": os.getenv("SANGER_WXS_WF_VERSION"),
 #     "max_runs": os.getenv("SANGER_WXS_MAX_RUNS"),
 #     "cpus": os.getenv("SANGER_WXS_CPUS"),
