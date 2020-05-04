@@ -69,25 +69,25 @@ class WorkflowBase(ABC):
         # Compute job availability
         run_availability = self.__computeRunAvailability(global_run_count)
 
-        # # Start new jobs if there is room
-        # if (run_availability > 0):
-        #     # Start jobs if possible
-        #     print("Starting new jobs if NFS available ...")
-        #     self.__startJobsOnEmptyNFS(run_availability, global_work_dirs_in_use)
+        # Start new jobs if there is room
+        if (run_availability > 0):
+            # Start jobs if possible
+            print("Starting new jobs if NFS available ...")
+            self.__startJobsOnEmptyNFS(run_availability, global_work_dirs_in_use)
 
-        #     # Update again (after 30 second delay)
-        #     self.__printSleepForN(30)
-        #     self.sheet_data = self.__updateSheetWithWesData()
-        # else:
-        #     print("WES currently at max run capacity ({})".format(self.max_runs))
+            # Update again (after 30 second delay)
+            self.__printSleepForN(30)
+            self.sheet_data = self.__updateSheetWithWesData()
+        else:
+            print("WES currently at max run capacity ({})".format(self.max_runs))
 
-        # # Update state
-        # self.run_count = self.__getCurrentRunCount()
-        # self.work_dirs_in_use = self.__getWorkdirsInUse()
+        # Update state
+        self.run_count = self.__getCurrentRunCount()
+        self.work_dirs_in_use = self.__getWorkdirsInUse()
 
-        # # Write sheet
-        # print("Writing sheet data to Google Sheets ...")
-        # self.sheet.write(self.sheet_range, self.sheet_data)
+        # Write sheet
+        print("Writing sheet data to Google Sheets ...")
+        self.sheet.write(self.sheet_range, self.sheet_data)
 
     def recall(self, run_ids):
         # get latest run info for sheet data
@@ -126,7 +126,7 @@ class WorkflowBase(ABC):
     def __gqlQueryBuilder(self):
         return gql('''
         {
-            runs(filter: {repository:\"%s\"} ) {
+            runs(page: {from: 0, size: 1000}, filter: {repository:\"%s\"} ) {
                 runId
                 state
                 parameters

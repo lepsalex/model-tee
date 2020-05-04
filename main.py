@@ -6,8 +6,8 @@ from tee.SangerWGSWorkflow import SangerWGSWorkflow
 from tee.SangerWXSWorkflow import SangerWXSWorkflow
 from dotenv import load_dotenv
 
-# load env from file if present
-load_dotenv('.env.dev')
+# load env from file
+load_dotenv()
 
 # Build workflow objects
 align_workflow = AlignWorkflow({
@@ -41,7 +41,7 @@ align_workflow = AlignWorkflow({
 # })
 
 # run on start
-align_workflow.run(True)
+align_workflow.run(quick=True)
 
 # # Message function to run on every message from Kafka on defined topic
 # def onMessageFunc(message):

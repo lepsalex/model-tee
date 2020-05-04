@@ -8,7 +8,7 @@ from gql import Client
 from gql.transport.requests import RequestsHTTPTransport
 from dotenv import load_dotenv
 
-load_dotenv('.env.dev')
+load_dotenv()
 
 
 class Wes:
