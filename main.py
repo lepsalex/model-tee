@@ -43,16 +43,16 @@ align_workflow = AlignWorkflow({
 # run on start
 align_workflow.run(quick=True)
 
-# # Message function to run on every message from Kafka on defined topic
-# def onMessageFunc(message):
-#     print("Workflow event received ... applying filter ...")
+# Message function to run on every message from Kafka on defined topic
+def onMessageFunc(message):
+    print("Workflow event received ... applying filter ...")
 
-#     if message.value["event"] == "completed":
-#         align_workflow.run()
-#     else:
-#         print("Event does not pass filter!")
+    if message.value["event"] == "completed":
+        align_workflow.run()
+    else:
+        print("Event does not pass filter!")
 
 
-# # subscribe to workflow events and run on
-# print("Waiting for workflow events ...")
-# Kafka.consumeTopicWith(onMessageFunc)
+# subscribe to workflow events and run on
+print("Waiting for workflow events ...")
+Kafka.consumeTopicWith(onMessageFunc)
