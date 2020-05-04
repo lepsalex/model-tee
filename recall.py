@@ -3,7 +3,7 @@ from tee.AlignWorkflow import AlignWorkflow
 from dotenv import load_dotenv
 
 # load env from file if present
-load_dotenv(".env")
+load_dotenv(".env.prod")
 
 # Build workflow objects
 align_workflow = AlignWorkflow({

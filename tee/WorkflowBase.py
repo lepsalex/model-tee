@@ -2,6 +2,7 @@ import os
 import pandas as pd
 from time import sleep
 from abc import ABC, abstractmethod
+from gql import gql
 from repository.Sheet import Sheet
 from service.Wes import Wes
 
@@ -29,14 +30,15 @@ class WorkflowBase(ABC):
         # initial state
         self.sheet = Sheet(self.sheet_id)
         self.sheet_data = self.sheet.read(self.sheet_range)
+        self.gql_query = self.__gqlQueryBuilder()
         self.run_count = self.__getCurrentRunCount()
         self.work_dirs_in_use = self.__getWorkdirsInUse()
 
     @abstractmethod
-    def transformRunData(self, data):
+    def transformRunData(self, gql_run):
         """
-        Defines how to parse wes response data for this workflow.
-        Must be implemented, called from fetchWesRun()
+        Converts raw GQL response into format we
+        can merge with what is in the Sheet
         """
         pass
 
@@ -121,8 +123,32 @@ class WorkflowBase(ABC):
     def work_dirs_in_use(self, work_dirs_in_use):
         self.__work_dirs_in_use = work_dirs_in_use
 
+    def __gqlQueryBuilder(self):
+        return gql('''
+        {
+            runs(page: {from: 0, size: 1000}, filter: {repository:\"%s\"} ) {
+                runId
+                state
+                parameters
+                startTime
+                completeTime
+                duration
+                tasks {
+                    process
+                    tag
+                    cpus
+                    memory
+                    duration
+                    realtime
+                    startTime
+                    completeTime
+                }
+            }
+        }
+        ''' % self.wf_url)
+
     def __updateSheetWithWesData(self):
-        runs = Wes.fetchWesRunsAsDataframeForWorkflow(self.wf_url, self.transformRunData)
+        runs = Wes.fetchWesRunsAsDataframeForWorkflow(self.gql_query, self.transformRunData)
 
         # if we don't have any runs exit
         if runs.size == 0:
@@ -204,22 +230,3 @@ class WorkflowBase(ABC):
         for line in logo_gram:
             print(line)
             sleep(0.7)
-
-    @classmethod
-    def processTasks(cls, task):
-        """
-        Tasks are universal between workflows for our purposed,
-        this utility method can be called by any implementing
-        class if needed
-        """
-        if task["state"] == "COMPLETE" and task["exit_code"] != "0":
-            return {
-                "process": task["process"],
-                "tag": task["tag"],
-                "cpus": task["cpus"],
-                "memory": task["memory"],
-                "duration": task["duration"],
-                "realtime": task["realtime"],
-                "start": task["start_time"],
-                "end": task["end_time"]
-            }
