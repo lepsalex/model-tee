@@ -15,9 +15,9 @@ class SangerWorkflowBase(WorkflowBase):
             "run_id": data["runId"],
             "state": data["state"],
             "params": data["parameters"],
-            "start": data["startTime"],
-            "end": data["completeTime"],
-            "duration": round(int(data["duration"]) / 1000 / 60 / 60, 2) if data["duration"] and data["duration"] != 0 else None,
+            "start": self.esTimestampToLocalDate(data["startTime"]),
+            "end": self.esTimestampToLocalDate(data["completeTime"]),
+            "duration": float(round(int(data["duration"]) / 1000 / 60 / 60, 2)) if data["duration"] and data["duration"] != 0 else None,
         }
 
     def mergeRunsWithSheetData(self, runs):

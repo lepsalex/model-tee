@@ -1,5 +1,7 @@
 import os
+import pytz
 import pandas as pd
+from datetime import datetime
 from time import sleep
 from abc import ABC, abstractmethod
 from gql import gql
@@ -195,6 +197,12 @@ class WorkflowBase(ABC):
         for x in reversed(range(n)):
             print("."[0:1]*min(x, 9), x)
             sleep(1)
+
+    @classmethod
+    def esTimestampToLocalDate(cls, timestamp):
+        eastern = pytz.timezone('US/Eastern')
+        ts = int(timestamp) / 1000 if timestamp else None
+        return format(eastern.localize(datetime.fromtimestamp(ts))) if ts else None
 
     @classmethod
     def __printStartScreen(cls):
