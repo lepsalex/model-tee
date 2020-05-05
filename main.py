@@ -1,13 +1,22 @@
 import os
 from kafka import KafkaConsumer
 from service.Kafka import Kafka
+from service.CircuitBreaker import CircuitBreaker
+from service.Health import Health
 from tee.AlignWorkflow import AlignWorkflow
 from tee.SangerWGSWorkflow import SangerWGSWorkflow
 from tee.SangerWXSWorkflow import SangerWXSWorkflow
 from dotenv import load_dotenv
 
+from time import sleep
+
 # load env from file
-load_dotenv()
+load_dotenv(".env.dev")
+
+# Build circuit breaker
+cb = CircuitBreaker(3, 7)
+
+Health.run()
 
 # Build workflow objects
 align_workflow = AlignWorkflow({
@@ -40,19 +49,26 @@ align_workflow = AlignWorkflow({
 #     "mem": os.getenv("SANGER_WXS_MEM")
 # })
 
-# run on start
-align_workflow.run(quick=True)
+# # run on start (if we are not in circuit breaker blown state)
+# if not cb.is_blown:
+#     align_workflow.run(quick=True)
 
-# Message function to run on every message from Kafka on defined topic
-def onMessageFunc(message):
-    print("Workflow event received ... applying filter ...")
+# # Message function to run on every message from Kafka on defined topic
+# def onMessageFunc(message):
+#     print("Workflow event received ... applying filter ...")
 
-    if message.value["event"] == "completed":
-        align_workflow.run()
-    else:
-        print("Event does not pass filter!")
+#     if message.value["event"] == "completed":
+#         # update circuit breaker state before starting a new run
+#         cb.update()
+
+#         if not cb.is_blown:
+#             align_workflow.run()
+#     else:
+#         print("Event does not pass filter!")
 
 
-# subscribe to workflow events and run on
-print("Waiting for workflow events ...")
-Kafka.consumeTopicWith(onMessageFunc)
+# # subscribe to workflow events and run on
+# print("Waiting for workflow events ...")
+# Kafka.consumeTopicWith(onMessageFunc)
+
+sleep(3600)
