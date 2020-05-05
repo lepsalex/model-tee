@@ -133,16 +133,6 @@ class WorkflowBase(ABC):
                 startTime
                 completeTime
                 duration
-                tasks {
-                    process
-                    tag
-                    cpus
-                    memory
-                    duration
-                    realtime
-                    startTime
-                    completeTime
-                }
             }
         }
         ''' % self.wf_url)

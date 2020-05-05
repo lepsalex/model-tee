@@ -17,7 +17,6 @@ class AlignWorkflow(WorkflowBase):
             "start": data["startTime"],
             "end": data["completeTime"],
             "duration": round(int(data["duration"]) / 1000 / 60 / 60, 2) if data["duration"] and data["duration"] != 0 else None,
-            "tasks": data["tasks"]
         }
 
     def mergeRunsWithSheetData(self, runs):
