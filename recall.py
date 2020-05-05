@@ -17,10 +17,6 @@ align_workflow = AlignWorkflow({
 })
 
 # Recall Script (to be run locally only!)
-recall_list = [
-    "74e49f21-677e-4882-93bb-7c3534744cd4",
-    "62649b5e-81cd-4e50-9817-346f53f0bc30",
-    "215a4109-ccb3-40a9-94f2-3f18b4cc2b7e"   
-]
+recall_list = []
 
 align_workflow.recall(recall_list)
