@@ -91,6 +91,17 @@ class WorkflowBase(ABC):
         print("Writing sheet data to Google Sheets ...")
         self.sheet.write(self.sheet_range, self.sheet_data)
 
+    def update(self):
+        """
+        Does a quick spreadsheet update with the latest from WES
+        """
+        # get latest run info for sheet data
+        self.sheet_data = self.__updateSheetWithWesData()
+
+        # Write sheet
+        print("Writing sheet data to Google Sheets ...")
+        self.sheet.write(self.sheet_range, self.sheet_data)
+
     def recall(self, run_ids):
         # get latest run info for sheet data
         sheet_data = self.__updateSheetWithWesData()
@@ -129,7 +140,7 @@ class WorkflowBase(ABC):
         return gql('''
         {
             runs(page: {from: 0, size: 1000}, filter: {repository:\"%s\"} ) {
-                runId
+                runName
                 state
                 parameters
                 startTime

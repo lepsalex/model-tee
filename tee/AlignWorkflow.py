@@ -10,7 +10,7 @@ class AlignWorkflow(WorkflowBase):
     def transformRunData(self, data):
         return {
             "analysis_id": data["parameters"]["analysis_id"],
-            "run_id": data["runId"],
+            "run_id": data["runName"],
             "state": data["state"],
             "params": data["parameters"],
             "start": self.esTimestampToLocalDate(data["startTime"]),

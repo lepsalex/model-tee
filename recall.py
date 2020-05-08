@@ -3,7 +3,7 @@ from tee.AlignWorkflow import AlignWorkflow
 from dotenv import load_dotenv
 
 # load env from file if present
-load_dotenv(".env.prod")
+load_dotenv()
 
 # Build workflow objects
 align_workflow = AlignWorkflow({
@@ -19,4 +19,5 @@ align_workflow = AlignWorkflow({
 # Recall Script (to be run locally only!)
 recall_list = []
 
+# align_workflow.update()
 align_workflow.recall(recall_list)
