@@ -1,6 +1,7 @@
 import os
 from kafka import KafkaConsumer
 from service.Kafka import Kafka
+from service.CircuitBreaker import CircuitBreaker
 from tee.AlignWorkflow import AlignWorkflow
 from tee.SangerWGSWorkflow import SangerWGSWorkflow
 from tee.SangerWXSWorkflow import SangerWXSWorkflow
@@ -8,6 +9,12 @@ from dotenv import load_dotenv
 
 # load env from file
 load_dotenv()
+
+# Build circuit breaker
+circuit_breaker = CircuitBreaker(
+    int(os.getenv("CB_LIMIT", 3)),
+    int(os.getenv("CB_RANGE_DAYS", 7))
+)
 
 # Build workflow objects
 align_workflow = AlignWorkflow({
@@ -40,18 +47,26 @@ align_workflow = AlignWorkflow({
 #     "mem": os.getenv("SANGER_WXS_MEM")
 # })
 
-# run on start
-align_workflow.run(quick=True)
+def runOrUpdate(wf, cb):
+    cb.update()
+
+    if not cb.is_blown:
+        wf.run(quick=True)
+    else:
+        wf.update()
 
 # Message function to run on every message from Kafka on defined topic
 def onMessageFunc(message):
     print("Workflow event received ... applying filter ...")
 
     if message.value["event"] == "completed":
-        align_workflow.run()
+        runOrUpdate(align_workflow, circuit_breaker)
     else:
         print("Event does not pass filter!")
 
+
+# run on start (if we are not in circuit breaker blown state)
+runOrUpdate(align_workflow, circuit_breaker)
 
 # subscribe to workflow events and run on
 print("Waiting for workflow events ...")
