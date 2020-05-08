@@ -2,7 +2,6 @@ import os
 from kafka import KafkaConsumer
 from service.Kafka import Kafka
 from service.CircuitBreaker import CircuitBreaker
-from service.Health import Health
 from tee.AlignWorkflow import AlignWorkflow
 from tee.SangerWGSWorkflow import SangerWGSWorkflow
 from tee.SangerWXSWorkflow import SangerWXSWorkflow
@@ -15,8 +14,6 @@ load_dotenv(".env.dev")
 
 # Build circuit breaker
 cb = CircuitBreaker(3, 7)
-
-Health.run()
 
 # Build workflow objects
 align_workflow = AlignWorkflow({
