@@ -13,7 +13,7 @@ load_dotenv()
 # Build circuit breaker
 circuit_breaker = CircuitBreaker(
     int(os.getenv("CB_LIMIT", 3)),
-    int(os.getenv("CB_RANGE_DAYS", 7))
+    int(os.getenv("CB_RANGE_DAYS", 2))
 )
 
 # Build workflow objects
