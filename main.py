@@ -47,26 +47,32 @@ align_workflow = AlignWorkflow({
 #     "mem": os.getenv("SANGER_WXS_MEM")
 # })
 
-def runOrUpdate(wf, cb):
-    cb.update()
+def runOrUpdateFactory(wf, cb, quick=False):
+    def func(quick):
+        cb.update()
 
-    if not cb.is_blown:
-        wf.run(quick=True)
-    else:
-        wf.update()
+        if not cb.is_blown:
+            wf.run(quick)
+        else:
+            print("Fuse Blown!")
+            print("Error count: ".format(cb.error_count))
+            wf.update()
+    return func
+
+runOrUpdateAlign = runOrUpdateFactory(align_workflow, circuit_breaker)
 
 # Message function to run on every message from Kafka on defined topic
 def onMessageFunc(message):
     print("Workflow event received ... applying filter ...")
 
     if message.value["event"] == "completed":
-        runOrUpdate(align_workflow, circuit_breaker)
+        runOrUpdateAlign()
     else:
         print("Event does not pass filter!")
 
 
 # run on start (if we are not in circuit breaker blown state)
-runOrUpdate(align_workflow, circuit_breaker)
+runOrUpdateAlign(quick=True)
 
 # subscribe to workflow events and run on
 print("Waiting for workflow events ...")
