@@ -48,7 +48,7 @@ align_workflow = AlignWorkflow({
 # })
 
 def runOrUpdateFactory(wf, cb, quick=False):
-    def func(quick):
+    def func(quick=False):
         cb.update()
 
         if not cb.is_blown:
@@ -66,7 +66,7 @@ def onMessageFunc(message):
     print("Workflow event received ... applying filter ...")
 
     if message.value["event"] == "completed":
-        runOrUpdateAlign()
+        runOrUpdateAlign(quick=False)
     else:
         print("Event does not pass filter!")
 
