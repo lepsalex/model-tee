@@ -13,7 +13,7 @@ class SangerWXSRequest(WorkflowRequestBase):
         cpus = run_config["cpus"]
         mem = run_config["mem"]
 
-        params = {
+        return {
             "study_id": study_id,
             "normal_aln_analysis_id": normal_aln_analysis_id,
             "tumour_aln_analysis_id": tumour_aln_analysis_id,
@@ -54,13 +54,6 @@ class SangerWXSRequest(WorkflowRequestBase):
             },
             "cleanup": True
         }
-
-        if song_score_config.get("INTERMEDIATE_SONG_URL"):
-            params["download"]["song_url"] = song_score_config["INTERMEDIATE_SONG_URL"]
-            params["download"]["score_url"] = song_score_config["ICGC_SCORE_URL"]
-            params["download"]["score_api_token"] = song_score_config["ICGC_SCORE_TOKEN"]
-
-        return params
 
     def __str__(self):
         """
