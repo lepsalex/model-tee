@@ -17,7 +17,6 @@ class SangerWGSRequest(WorkflowRequestBase):
             "study_id": study_id,
             "normal_aln_analysis_id": normal_aln_analysis_id,
             "tumour_aln_analysis_id": tumour_aln_analysis_id,
-            "ref_genome_fa": "/{}/reference/GRCh38_hla_decoy_ebv/GRCh38_hla_decoy_ebv.fa".format(work_dir),
             "song_url": song_score_config["SONG_URL"],
             "score_url": song_score_config["SCORE_URL"],
             "api_token": song_score_config["SONG_API_TOKEN"],
@@ -40,7 +39,8 @@ class SangerWGSRequest(WorkflowRequestBase):
             },
             "generateBas": {
                 "cpus": 6,
-                "mem": 8
+                "mem": 32,
+                "ref_genome_fa": "/{}/reference/GRCh38_hla_decoy_ebv/GRCh38_hla_decoy_ebv.fa".format(work_dir)
             },
             "repackSangerResults": {
                 "cpus": 2,
