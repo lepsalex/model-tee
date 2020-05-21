@@ -28,11 +28,10 @@ sanger_wgs_workflow = SangerWGSWorkflow({
 })
 
 # Recall Script (to be run locally only!)
-recall_list = [
-    "wes-fd2f66cdd9de4b85bf6b647a22910882"
-]
+recall_list = []
 
 # align_workflow.update()
 # align_workflow.recall(recall_list)
 
-sanger_wgs_workflow.recall(recall_list)
+sanger_wgs_workflow.update()
+# sanger_wgs_workflow.recall(recall_list)
