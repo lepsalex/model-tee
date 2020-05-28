@@ -1,6 +1,7 @@
 import os
 import pytz
 import pandas as pd
+from functools import reduce
 from datetime import datetime
 from time import sleep
 from abc import ABC, abstractmethod
@@ -176,12 +177,25 @@ class WorkflowBase(ABC):
     def __getWorkdirsInUse(self):
         return self.sheet_data[self.sheet_data["state"] == "RUNNING"]["work_dir"].values
 
+    def __computeUnavailableWorkDirs(self, acc, curr):
+        """
+        Computes list of unavailable work_dir(s) as a list of dirs
+        have >= X jobs running where X is the max_runs_per_dir param
+        """
+        if (curr[1] >= int(self.max_runs_per_dir)):
+            acc.append(curr[0])
+
+        return acc
+
     def __startJobsOnEmptyNFS(self, run_availability, global_work_dirs_in_use=[]):
-        # check directories that are in use for this workflow
+        # get directories that are in use for this workflow
         not_schedulable_work_dirs = self.sheet_data.loc[self.sheet_data["state"].isin(self.NOT_SCHEDULABLE)].groupby(["work_dir"])
 
+        # get group size and pass to reduce to get unavailable directories (# jobs in dir >= max_runs_per_dir)
+        not_schedulable_work_dirs = reduce(self.__computeUnavailableWorkDirs, not_schedulable_work_dirs.size().iteritems(), [])
+
         # combine with globally used work_dirs (if any)
-        not_schedulable_work_dirs = set(list(not_schedulable_work_dirs.groups.keys()) + global_work_dirs_in_use)
+        not_schedulable_work_dirs = set(not_schedulable_work_dirs + global_work_dirs_in_use)
 
         # filter available directories (set of all dirs minus dirs in use + tainted dirs from env)
         unavailable_dir = {y for x in [not_schedulable_work_dirs, self.tainted_dir_list] for y in x if y}
