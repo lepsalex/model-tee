@@ -77,7 +77,7 @@ class WorkflowBase(ABC):
         if (run_availability > 0):
             # Start jobs if possible
             print("Starting new jobs if NFS available ...")
-            self.__startJobsOnEmptyNFS(run_availability, global_work_dirs_in_use)
+            self.__startJobsOnAvailableNFS(run_availability, global_work_dirs_in_use)
 
             # Update again (after 30 second delay)
             self.__printSleepForN(30)
@@ -187,7 +187,7 @@ class WorkflowBase(ABC):
 
         return acc
 
-    def __startJobsOnEmptyNFS(self, run_availability, global_work_dirs_in_use=[]):
+    def __startJobsOnAvailableNFS(self, run_availability, global_work_dirs_in_use=[]):
         # get directories that are in use for this workflow
         not_schedulable_work_dirs = self.sheet_data.loc[self.sheet_data["state"].isin(self.NOT_SCHEDULABLE)].groupby(["work_dir"])
 
@@ -201,8 +201,8 @@ class WorkflowBase(ABC):
         unavailable_dir = {y for x in [not_schedulable_work_dirs, self.tainted_dir_list] for y in x if y}
         eligible_workdirs = self.sheet_data.loc[~self.sheet_data["work_dir"].isin(unavailable_dir)]
 
-        # filter out any analyses that have already been completed
-        eligible_analyses = eligible_workdirs.loc[~self.sheet_data["state"].isin(self.ALREADY_RAN)]
+        # filter out any analyses that have already been completed or are currently running
+        eligible_analyses = eligible_workdirs.loc[~self.sheet_data["state"].isin(self.ALREADY_RAN + self.NOT_SCHEDULABLE)]
 
         # NOTE: ".sample(...)" is used below in order pull a random work_dir from the list otherwise
         # we would always be scheduling primarily on NFS-1/NFS-2 until all those runs were complete and then on
