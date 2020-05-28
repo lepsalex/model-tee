@@ -23,6 +23,7 @@ class WorkflowBase(ABC):
         self.wf_url = config["wf_url"]
         self.wf_version = config["wf_version"]
         self.max_runs = config["max_runs"]
+        self.max_runs_per_dir = config["max_runs_per_dir"]
         self.cpus = config["cpus"]
         self.mem = config["mem"]
 
