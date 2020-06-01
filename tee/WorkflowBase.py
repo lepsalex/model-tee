@@ -47,6 +47,14 @@ class WorkflowBase(ABC):
         pass
 
     @abstractmethod
+    def transformEventData(self, event_data):
+        """
+        Converts raw event data (usually from SONG)
+        so it can merge (append) to what is in the Sheet
+        """
+        pass
+
+    @abstractmethod
     def mergeRunsWithSheetData(self, runs):
         """
         Defines how run data is merged with the sheet for
@@ -121,6 +129,17 @@ class WorkflowBase(ABC):
         # Write sheet
         print("Writing sheet data to Google Sheets ...")
         self.sheet.write(self.sheet_range, sheet_data)
+
+    def appendAndRun(self, data, quick=False, global_run_count=0, global_work_dirs_in_use=[]):
+        # Print logogram if not in quick mode
+        if not quick:
+            self.__printStartScreen()
+
+        # get latest run info for sheet data
+        self.sheet_data = self.__updateSheetWithWesData()
+
+        # transform and append event-data as row
+
 
     @property
     def run_count(self):

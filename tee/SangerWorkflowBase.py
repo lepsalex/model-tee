@@ -46,3 +46,7 @@ class SangerWorkflowBase(WorkflowBase):
             "duration_x",
             "duration_y",
         ], axis=1)
+
+    def transformEventData(self, event_data):
+        # Not currently needed
+        pass
