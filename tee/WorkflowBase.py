@@ -1,6 +1,7 @@
 import os
 import pytz
 import pandas as pd
+from random import randint
 from functools import reduce
 from datetime import datetime
 from time import sleep
@@ -180,7 +181,21 @@ class WorkflowBase(ABC):
             print("Warning: no runs returned, defaulting to existing sheet data!")
             return self.sheet_data
 
-        return self.mergeRunsWithSheetData(runs)
+        merged_runs = self.mergeRunsWithSheetData(runs)
+        
+        # Assign random work_dir if not already in sheet
+        merged_runs.apply(self.__assignWorkDir, axis=1)
+
+        return merged_runs
+
+    def __assignWorkDir(self, row):
+        """
+        If no "work_dir" specified in sheet, will randomly assign a work_dir
+        """
+        if not row["work_dir"]:
+            row["work_dir"] = "nfs-{}-c{}".format(randint(1,4), randint(1,4))
+        
+        return row
 
     def __getCurrentRunCount(self):
         """
