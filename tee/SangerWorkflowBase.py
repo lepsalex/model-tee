@@ -7,6 +7,7 @@ class SangerWorkflowBase(WorkflowBase):
 
     def __init__(self, config):
         super().__init__(config)
+        self.index_cols = ["normal_aln_analysis_id", "tumour_aln_analysis_id"]
 
     def transformRunData(self, data):
         return {

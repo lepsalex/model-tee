@@ -24,7 +24,7 @@ class Wes:
     )
 
     @classmethod
-    def fetchWesRunsAsDataframeForWorkflow(cls, query, transform_func):
+    def fetchWesRunsAsDataframeForWorkflow(cls, query, transform_func, index_cols):
         # init to empty dataframe
         runs_df = pd.DataFrame()
 
@@ -35,8 +35,9 @@ class Wes:
             # convert gql response to something we can work with
             runs = [transform_func(run) for run in response["runs"]]
 
-            # create new dataframe and reassign
+            # create new dataframe and set index
             runs_df = pd.DataFrame(runs)
+            runs_df.set_index(index_cols)
         except ValueError as err:
             # log error and return empty dataframe
             print(err)

@@ -6,6 +6,7 @@ class AlignWorkflow(WorkflowBase):
 
     def __init__(self, config):
         super().__init__(config)
+        self.index_cols = ["analysis_id"]
 
     def transformRunData(self, data):
         return {

@@ -37,6 +37,7 @@ class WorkflowBase(ABC):
         self.gql_query = self.__gqlQueryBuilder()
         self.run_count = self.__getCurrentRunCount()
         self.work_dirs_in_use = self.__getWorkdirsInUse()
+        self.index_cols = None
 
     @abstractmethod
     def transformRunData(self, gql_run):
@@ -172,7 +173,7 @@ class WorkflowBase(ABC):
         ''' % self.wf_url)
 
     def __updateSheetWithWesData(self):
-        runs = Wes.fetchWesRunsAsDataframeForWorkflow(self.gql_query, self.transformRunData)
+        runs = Wes.fetchWesRunsAsDataframeForWorkflow(self.gql_query, self.transformRunData, self.index_cols)
 
         # if we don't have any runs exit
         if runs.size == 0:
