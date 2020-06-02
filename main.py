@@ -1,10 +1,12 @@
 import os
+from multiprocessing import Process
 from kafka import KafkaConsumer
 from service.Kafka import Kafka
 from service.CircuitBreaker import CircuitBreaker
 from tee.AlignWorkflow import AlignWorkflow
 from tee.SangerWGSWorkflow import SangerWGSWorkflow
 from tee.SangerWXSWorkflow import SangerWXSWorkflow
+from tee.Utils import Utils
 from dotenv import load_dotenv
 
 # load env from file
@@ -50,23 +52,11 @@ sanger_wgs_workflow = SangerWGSWorkflow({
 #     "mem": os.getenv("SANGER_WXS_MEM")
 # })
 
-def runOrUpdateFactory(wf, cb, quick=False):
-    def func(quick=False):
-        cb.update()
-
-        if not cb.is_blown:
-            wf.run(quick)
-        else:
-            print("Fuse Blown!")
-            print("Error count: ".format(cb.error_count))
-            wf.update()
-    return func
-
-# runOrUpdateAlign = runOrUpdateFactory(align_workflow, circuit_breaker)
-runOrUpdateSangerWGX = runOrUpdateFactory(sanger_wgs_workflow, circuit_breaker)
+# runOrUpdateAlign = Utils.methodOrUpdateFactory(align_workflow, "run", circuit_breaker)
+runOrUpdateSangerWGX = Utils.methodOrUpdateFactory(sanger_wgs_workflow, "run", circuit_breaker)
 
 # Message function to run on every message from Kafka on defined topic
-def onMessageFunc(message):
+def onWorkflowMessageFunc(message):
     print("Workflow event received ... applying filter ...")
 
     if message.value["event"] == "completed":
@@ -80,6 +70,8 @@ def onMessageFunc(message):
 # runOrUpdateAlign(quick=True)
 runOrUpdateSangerWGX(quick=True)
 
-# # subscribe to workflow events and run on
-# print("Waiting for workflow events ...")
-# Kafka.consumeTopicWith(onMessageFunc)
+# # subscribe to workflow events and run
+# if __name__ == '__main__':
+#     print("Waiting for workflow events ...")
+#     workflowConsumer = Process(target=Kafka.consumeTopicWith, args=(os.getenv("KAFKA_TOPIC", "workflow"), onWorkflowMessageFunc))
+#     workflowConsumer.start()
