@@ -24,7 +24,7 @@ class Wes:
     )
 
     @classmethod
-    def fetchWesRunsAsDataframeForWorkflow(cls, query, transform_func, index_cols):
+    def fetchWesRunsAsDataframeForWorkflow(cls, query, transform_func, index_cols=None):
         # init to empty dataframe
         runs_df = pd.DataFrame()
 
@@ -37,7 +37,9 @@ class Wes:
 
             # create new dataframe and set index
             runs_df = pd.DataFrame(runs)
-            runs_df.set_index(index_cols)
+
+            if index_cols:
+                runs_df.set_index(index_cols)
         except ValueError as err:
             # log error and return empty dataframe
             print(err)
