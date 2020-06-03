@@ -1,3 +1,5 @@
+import uuid
+
 class Utils():
     @staticmethod
     def methodOrUpdateFactory(wf, method_name, cb):
@@ -18,3 +20,11 @@ class Utils():
                 print("Error count: ".format(cb.error_count))
                 wf.update()
         return func
+
+    @staticmethod
+    def generateTestSongPubEvent():
+        return {
+            "analysisId": str(uuid.uuid4()),
+            "study": "TEST-MT",
+            "state": "PUBLISHED"
+        }
