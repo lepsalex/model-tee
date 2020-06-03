@@ -61,5 +61,7 @@ class CovidWorkflow(WorkflowBase):
         return CovidRequest(self.wf_url, config)
 
     def transformEventData(self, event_data):
-        # Not currently needed
-        pass
+        return {
+            "study_id": event_data["study"],
+            "analysis_id": event_data["analysisId"],
+        }
