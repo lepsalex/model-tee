@@ -1,10 +1,13 @@
 import os
+from multiprocessing import Process
 from kafka import KafkaConsumer
 from service.Kafka import Kafka
 from service.CircuitBreaker import CircuitBreaker
 from tee.AlignWorkflow import AlignWorkflow
 from tee.SangerWGSWorkflow import SangerWGSWorkflow
 from tee.SangerWXSWorkflow import SangerWXSWorkflow
+from tee.CovidWorkflow import CovidWorkflow
+from tee.Utils import Utils
 from dotenv import load_dotenv
 
 # load env from file
@@ -50,36 +53,50 @@ sanger_wgs_workflow = SangerWGSWorkflow({
 #     "mem": os.getenv("SANGER_WXS_MEM")
 # })
 
-def runOrUpdateFactory(wf, cb, quick=False):
-    def func(quick=False):
-        cb.update()
+# covid_workflow = CovidWorkflow({
+#     "sheet_id": os.getenv("COVID_SHEET_ID"),
+#     "sheet_range": os.getenv("COVID_SHEET_RANGE"),
+#     "wf_url": os.getenv("COVID_WF_URL"),
+#     "wf_version": os.getenv("COVID_WF_VERSION"),
+#     "max_runs": os.getenv("COVID_MAX_RUNS"),
+#     "max_runs_per_dir": os.getenv("COVID_MAX_RUNS_PER_DIR"),
+#     "cpus": os.getenv("COVID_CPUS"),
+#     "mem": os.getenv("COVID_MEM")
+# })
 
-        if not cb.is_blown:
-            wf.run(quick)
-        else:
-            print("Fuse Blown!")
-            print("Error count: ".format(cb.error_count))
-            wf.update()
-    return func
+# runOrUpdateAlign = Utils.methodOrUpdateFactory(align_workflow, "run", circuit_breaker)
+runOrUpdateSangerWGX = Utils.methodOrUpdateFactory(sanger_wgs_workflow, "run", circuit_breaker)
+# appendAndRunCovid = Utils.methodOrUpdateFactory(covid_workflow, "appendAndRun", circuit_breaker)
 
-# runOrUpdateAlign = runOrUpdateFactory(align_workflow, circuit_breaker)
-runOrUpdateSangerWGX = runOrUpdateFactory(sanger_wgs_workflow, circuit_breaker)
 
-# Message function to run on every message from Kafka on defined topic
-def onMessageFunc(message):
+def onWorkflowMessageFunc(message):
     print("Workflow event received ... applying filter ...")
 
     if message.value["event"] == "completed":
+        print("Workflow event valid, starting configured processes ...")
         # runOrUpdateAlign(quick=False)
         runOrUpdateSangerWGX(quick=False)
     else:
-        print("Event does not pass filter!")
+        print("Workflow event does not pass filter!")
+
+# def onSongMessageFunc(message):
+#     print("SONG event received ... applying filter ...")
+#
+#     if message.value["state"] == "PUBLISHED":
+#         appendAndRunCovid(date=message.value, quick=False)
+#     else:
+#         print("SONG event does not pass filter!")
 
 
-# run on start (if we are not in circuit breaker blown state)
-# runOrUpdateAlign(quick=True)
-runOrUpdateSangerWGX(quick=True)
+# Processes
+workflowConsumer = Process(target=Kafka.consumeTopicWith, args=(os.getenv("KAFKA_TOPIC", "workflow"), onWorkflowMessageFunc))
 
-# # subscribe to workflow events and run on
-# print("Waiting for workflow events ...")
-# Kafka.consumeTopicWith(onMessageFunc)
+# Main
+if __name__ == '__main__':
+    # run on start (if we are not in circuit breaker blown state)
+    # runOrUpdateAlign(quick=True)
+    runOrUpdateSangerWGX(quick=True)
+
+    # subscribe to workflow events and run
+    print("Waiting for workflow events ...")
+    workflowConsumer.start()

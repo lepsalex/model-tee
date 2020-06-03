@@ -1,8 +1,8 @@
 import pandas as pd
 from tee.WorkflowBase import WorkflowBase
-from tee.model.AlignRequest import AlignRequest
+from tee.model.CovidRequest import CovidRequest
 
-class AlignWorkflow(WorkflowBase):
+class CovidWorkflow(WorkflowBase):
 
     def __init__(self, config):
         super().__init__(config)
@@ -58,8 +58,10 @@ class AlignWorkflow(WorkflowBase):
         if resume:
             config["resume"] = run["run_id"]
 
-        return AlignRequest(self.wf_url, config)
+        return CovidRequest(self.wf_url, config)
 
     def transformEventData(self, event_data):
-        # Not currently needed
-        pass
+        return {
+            "study_id": event_data["study"],
+            "analysis_id": event_data["analysisId"],
+        }

@@ -1,6 +1,8 @@
 import os
 import pytz
+import uuid
 import pandas as pd
+from random import randint
 from functools import reduce
 from datetime import datetime
 from time import sleep
@@ -37,12 +39,21 @@ class WorkflowBase(ABC):
         self.gql_query = self.__gqlQueryBuilder()
         self.run_count = self.__getCurrentRunCount()
         self.work_dirs_in_use = self.__getWorkdirsInUse()
+        self.index_cols = None
 
     @abstractmethod
     def transformRunData(self, gql_run):
         """
         Converts raw GQL response into format we
         can merge with what is in the Sheet
+        """
+        pass
+
+    @abstractmethod
+    def transformEventData(self, event_data):
+        """
+        Converts raw event data (usually from SONG)
+        so it can merge (append) to what is in the Sheet
         """
         pass
 
@@ -122,6 +133,48 @@ class WorkflowBase(ABC):
         print("Writing sheet data to Google Sheets ...")
         self.sheet.write(self.sheet_range, sheet_data)
 
+    def appendAndRun(self, data, quick=False, global_run_count=0, global_work_dirs_in_use=[]):
+        # Print logogram if not in quick mode
+        if not quick:
+            self.__printStartScreen()
+
+        try:
+            # transform and append event-data as row
+            event_data = self.transformEventData(data)
+            row = pd.Series(data=event_data, name=str(uuid.uuid4()))
+            self.sheet_data = self.sheet_data.append(row, verify_integrity=True)
+        except ValueError as err:
+            print("Cannot append row to sheet, duplicate key detected.\n\Data: {}\n\nError: {}".format(row, err))
+
+        
+        # get latest run info for sheet data
+        self.sheet_data = self.__updateSheetWithWesData()
+        
+        print(self.sheet_data)
+
+        # # Compute job availability
+        # run_availability = self.__computeRunAvailability(global_run_count)
+
+        # # Start new jobs if there is room
+        # if (run_availability > 0):
+        #     # Start jobs if possible
+        #     print("Starting new jobs if NFS available ...")
+        #     self.__startJobsOnAvailableNFS(run_availability, global_work_dirs_in_use)
+
+        #     # Update again (after 30 second delay)
+        #     self.__printSleepForN(30)
+        #     self.sheet_data = self.__updateSheetWithWesData()
+        # else:
+        #     print("WES currently at max run capacity ({})".format(self.max_runs))
+
+        # # Update state
+        # self.run_count = self.__getCurrentRunCount()
+        # self.work_dirs_in_use = self.__getWorkdirsInUse()
+
+        # Write sheet
+        print("Writing sheet data to Google Sheets ...")
+        self.sheet.write(self.sheet_range, self.sheet_data)
+
     @property
     def run_count(self):
         return self.__run_count
@@ -153,20 +206,38 @@ class WorkflowBase(ABC):
         ''' % self.wf_url)
 
     def __updateSheetWithWesData(self):
-        runs = Wes.fetchWesRunsAsDataframeForWorkflow(self.gql_query, self.transformRunData)
+        df = self.sheet_data
+        runs = Wes.fetchWesRunsAsDataframeForWorkflow(self.gql_query, self.transformRunData, self.index_cols)
 
-        # if we don't have any runs exit
+        # Merge with WES data if it exists
         if runs.size == 0:
             print("Warning: no runs returned, defaulting to existing sheet data!")
-            return self.sheet_data
+            df.fillna(value="", inplace=True)
+        else:
+            df = self.mergeRunsWithSheetData(runs)
+        
+        # Assign random work_dir if not already in sheet
+        df.apply(self.__assignWorkDir, axis=1)
 
-        return self.mergeRunsWithSheetData(runs)
+        return df
+
+    def __assignWorkDir(self, row):
+        """
+        If no "work_dir" specified in sheet, will randomly assign a work_dir
+        """
+        if not row["work_dir"]:
+            row["work_dir"] = "nfs-{}-c{}".format(randint(1,4), randint(1,4))
+        
+        return row
 
     def __getCurrentRunCount(self):
         """
         Get count of currently running jobs for THIS workflow
         """
-        return self.sheet_data.groupby("state")["state"].count().get("RUNNING", 0)
+        if self.sheet_data.size > 0:
+            return self.sheet_data.groupby("state")["state"].count().get("RUNNING", 0)
+        else:
+            return 0
 
     def __computeRunAvailability(self, global_run_count):
         """
@@ -175,7 +246,10 @@ class WorkflowBase(ABC):
         return int(self.max_runs) - (int(self.__getCurrentRunCount()) + global_run_count)
 
     def __getWorkdirsInUse(self):
-        return self.sheet_data[self.sheet_data["state"] == "RUNNING"]["work_dir"].values
+        if self.sheet_data.size > 0:
+            return self.sheet_data[self.sheet_data["state"] == "RUNNING"]["work_dir"].values
+        else:
+            return []
 
     def __computeUnavailableWorkDirs(self, acc, curr):
         """
