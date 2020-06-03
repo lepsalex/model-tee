@@ -228,7 +228,10 @@ class WorkflowBase(ABC):
         """
         Get count of currently running jobs for THIS workflow
         """
-        return self.sheet_data.groupby("state")["state"].count().get("RUNNING", 0)
+        if self.sheet_data:
+            return self.sheet_data.groupby("state")["state"].count().get("RUNNING", 0)
+        else:
+            return 0
 
     def __computeRunAvailability(self, global_run_count):
         """
@@ -237,7 +240,10 @@ class WorkflowBase(ABC):
         return int(self.max_runs) - (int(self.__getCurrentRunCount()) + global_run_count)
 
     def __getWorkdirsInUse(self):
-        return self.sheet_data[self.sheet_data["state"] == "RUNNING"]["work_dir"].values
+        if self.sheet_data:
+            return self.sheet_data[self.sheet_data["state"] == "RUNNING"]["work_dir"].values
+        else:
+            return []
 
     def __computeUnavailableWorkDirs(self, acc, curr):
         """
