@@ -60,8 +60,10 @@ class Sheet:
         header = data[0]  # Assumes first line is header
         values = data[1:]
 
-        if not values:
+        if not header:
             print("No data found!")
+            # return empty dataframe
+            return pd.DataFrame()
         else:
             data = []
             for col_id, col_name in enumerate(header):

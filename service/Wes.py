@@ -37,8 +37,8 @@ class Wes:
 
             # create new dataframe and set index
             runs_df = pd.DataFrame(runs)
-
-            if index_cols:
+            
+            if index_cols and runs_df.size > 0:
                 runs_df.set_index(index_cols)
         except ValueError as err:
             # log error and return empty dataframe

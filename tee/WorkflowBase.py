@@ -228,7 +228,7 @@ class WorkflowBase(ABC):
         """
         Get count of currently running jobs for THIS workflow
         """
-        if self.sheet_data:
+        if self.sheet_data.size > 0:
             return self.sheet_data.groupby("state")["state"].count().get("RUNNING", 0)
         else:
             return 0
@@ -240,7 +240,7 @@ class WorkflowBase(ABC):
         return int(self.max_runs) - (int(self.__getCurrentRunCount()) + global_run_count)
 
     def __getWorkdirsInUse(self):
-        if self.sheet_data:
+        if self.sheet_data.size > 0:
             return self.sheet_data[self.sheet_data["state"] == "RUNNING"]["work_dir"].values
         else:
             return []
