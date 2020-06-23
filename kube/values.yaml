@@ -25,7 +25,7 @@ spec:
         runAsUser: 9999
       containers:
         - name: model-tee
-          image: lepsalex/model-tee:2.4.0
+          image: lepsalex/model-tee:3.0.0
           imagePullPolicy: Always
           volumeMounts:
             - name: model-tee-app
