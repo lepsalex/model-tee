@@ -11,7 +11,7 @@ class CovidWorkflow(WorkflowBase):
     def transformRunData(self, data):
         return {
             "analysis_id": data["parameters"]["analysis_id"],
-            "run_id": data["runName"],
+            "run_id": data["runId"],
             "state": data["state"],
             "params": data["parameters"],
             "start": self.esTimestampToLocalDate(data["startTime"]),

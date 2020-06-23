@@ -32,7 +32,7 @@ class CircuitBreaker:
         query = gql('''
         {
             runs(page: {from: 0, size: 10}, filter: {state: "EXECUTOR_ERROR"}) {
-                runName
+                runId
                 state
                 completeTime
             }
@@ -51,7 +51,7 @@ class CircuitBreaker:
         delta = dateutil.relativedelta.relativedelta(now, completeTime)
 
         return {
-            "run_id": data["runName"],
+            "run_id": data["runId"],
             "state": data["state"],
             "completeTime": format(completeTime),
             "overload": True if delta.days < self.range_in_days else False

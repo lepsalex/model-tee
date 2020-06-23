@@ -195,7 +195,7 @@ class WorkflowBase(ABC):
         return gql('''
         {
             runs(page: {from: 0, size: 1000}, filter: {repository:\"%s\"} ) {
-                runName
+                runId
                 state
                 parameters
                 startTime
