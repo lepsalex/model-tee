@@ -196,6 +196,7 @@ class WorkflowBase(ABC):
         {
             runs(page: {from: 0, size: 1000}, filter: {repository:\"%s\"} ) {
                 runId
+                sessionId
                 state
                 parameters
                 startTime
