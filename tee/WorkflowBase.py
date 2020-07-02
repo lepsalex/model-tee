@@ -149,8 +149,9 @@ class WorkflowBase(ABC):
         
         # get latest run info for sheet data
         self.sheet_data = self.__updateSheetWithWesData()
-        
-        print(self.sheet_data)
+
+        # TODO: Finish up testing and make a real feature
+        # print(self.sheet_data)
 
         # # Compute job availability
         # run_availability = self.__computeRunAvailability(global_run_count)
@@ -171,9 +172,9 @@ class WorkflowBase(ABC):
         # self.run_count = self.__getCurrentRunCount()
         # self.work_dirs_in_use = self.__getWorkdirsInUse()
 
-        # Write sheet
-        print("Writing sheet data to Google Sheets ...")
-        self.sheet.write(self.sheet_range, self.sheet_data)
+        # # Write sheet
+        # print("Writing sheet data to Google Sheets ...")
+        # self.sheet.write(self.sheet_range, self.sheet_data)
 
     @property
     def run_count(self):
