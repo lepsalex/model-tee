@@ -115,11 +115,11 @@ class WorkflowBase(ABC):
         print("Writing sheet data to Google Sheets ...")
         self.sheet.write(self.sheet_range, self.sheet_data)
 
-    def recall(self, run_ids):
+    def recall(self, session_ids):
         # get latest run info for sheet data
         sheet_data = self.__updateSheetWithWesData()
 
-        retry_runs = sheet_data.loc[sheet_data["run_id"].isin(run_ids)]
+        retry_runs = sheet_data.loc[sheet_data["session_id"].isin(session_ids)]
 
         requests = [self.buildRunRequests(retry_run[1], True) for retry_run in retry_runs.iterrows()]
 
