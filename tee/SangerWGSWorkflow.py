@@ -20,6 +20,6 @@ class SangerWGSWorkflow(SangerWorkflowBase):
         }
 
         if resume:
-            config["resume"] = run["run_id"]
+            config["resume"] = run["session_id"]
 
         return SangerWGSRequest(self.wf_url, config)

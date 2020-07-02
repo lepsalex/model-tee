@@ -2,6 +2,7 @@ import pandas as pd
 from tee.WorkflowBase import WorkflowBase
 from tee.model.CovidRequest import CovidRequest
 
+
 class CovidWorkflow(WorkflowBase):
 
     def __init__(self, config):
@@ -12,6 +13,7 @@ class CovidWorkflow(WorkflowBase):
         return {
             "analysis_id": data["parameters"]["analysis_id"],
             "run_id": data["runId"],
+            "session_id": data["sessionId"],
             "state": data["state"],
             "params": data["parameters"],
             "start": self.esTimestampToLocalDate(data["startTime"]),
@@ -24,9 +26,11 @@ class CovidWorkflow(WorkflowBase):
         latest_runs = runs.sort_values(["start"], ascending=False).groupby("analysis_id").head(1)
 
         # Update sheet data
-        new_sheet_data = pd.merge(self.sheet_data, latest_runs[["analysis_id", "run_id", "state", "start", "end", "duration"]], on="analysis_id", how="left")
+        new_sheet_data = pd.merge(self.sheet_data, latest_runs[["analysis_id", "run_id", "session_id",
+                                                                "state", "start", "end", "duration"]], on="analysis_id", how="left")
 
         new_sheet_data["run_id"] = new_sheet_data["run_id_y"].fillna("")
+        new_sheet_data["session_id"] = new_sheet_data["session_id_y"].fillna("")
         new_sheet_data["state"] = new_sheet_data["state_y"].fillna("")
         new_sheet_data["start"] = new_sheet_data["start_y"].fillna("")
         new_sheet_data["end"] = new_sheet_data["end_y"].fillna("")
@@ -35,6 +39,8 @@ class CovidWorkflow(WorkflowBase):
         return new_sheet_data.drop([
             "run_id_x",
             "run_id_y",
+            "session_id_x",
+            "session_id_y",
             "state_y",
             "state_x",
             "start_x",
@@ -56,7 +62,7 @@ class CovidWorkflow(WorkflowBase):
         }
 
         if resume:
-            config["resume"] = run["run_id"]
+            config["resume"] = run["session_id"]
 
         return CovidRequest(self.wf_url, config)
 

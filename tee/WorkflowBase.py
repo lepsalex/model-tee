@@ -115,11 +115,11 @@ class WorkflowBase(ABC):
         print("Writing sheet data to Google Sheets ...")
         self.sheet.write(self.sheet_range, self.sheet_data)
 
-    def recall(self, run_ids):
+    def recall(self, session_ids):
         # get latest run info for sheet data
         sheet_data = self.__updateSheetWithWesData()
 
-        retry_runs = sheet_data.loc[sheet_data["run_id"].isin(run_ids)]
+        retry_runs = sheet_data.loc[sheet_data["session_id"].isin(session_ids)]
 
         requests = [self.buildRunRequests(retry_run[1], True) for retry_run in retry_runs.iterrows()]
 
@@ -149,8 +149,9 @@ class WorkflowBase(ABC):
         
         # get latest run info for sheet data
         self.sheet_data = self.__updateSheetWithWesData()
-        
-        print(self.sheet_data)
+
+        # TODO: Finish up testing and make a real feature
+        # print(self.sheet_data)
 
         # # Compute job availability
         # run_availability = self.__computeRunAvailability(global_run_count)
@@ -171,9 +172,9 @@ class WorkflowBase(ABC):
         # self.run_count = self.__getCurrentRunCount()
         # self.work_dirs_in_use = self.__getWorkdirsInUse()
 
-        # Write sheet
-        print("Writing sheet data to Google Sheets ...")
-        self.sheet.write(self.sheet_range, self.sheet_data)
+        # # Write sheet
+        # print("Writing sheet data to Google Sheets ...")
+        # self.sheet.write(self.sheet_range, self.sheet_data)
 
     @property
     def run_count(self):
@@ -196,6 +197,7 @@ class WorkflowBase(ABC):
         {
             runs(page: {from: 0, size: 1000}, filter: {repository:\"%s\"} ) {
                 runId
+                sessionId
                 state
                 parameters
                 startTime

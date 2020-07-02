@@ -14,6 +14,7 @@ class SangerWorkflowBase(WorkflowBase):
             "normal_aln_analysis_id": data["parameters"]["normal_aln_analysis_id"],
             "tumour_aln_analysis_id": data["parameters"]["tumour_aln_analysis_id"],
             "run_id": data["runId"],
+            "session_id": data["sessionId"],
             "state": data["state"],
             "params": data["parameters"],
             "start": self.esTimestampToLocalDate(data["startTime"]),
@@ -26,10 +27,11 @@ class SangerWorkflowBase(WorkflowBase):
         latest_runs = runs.sort_values(["start"], ascending=False).groupby(["normal_aln_analysis_id", "tumour_aln_analysis_id"]).head(1)
 
         # Update sheet data
-        new_sheet_data = pd.merge(self.sheet_data, latest_runs[["normal_aln_analysis_id", "tumour_aln_analysis_id", "run_id", "state", "start", "end", "duration"]], on=[
+        new_sheet_data = pd.merge(self.sheet_data, latest_runs[["normal_aln_analysis_id", "tumour_aln_analysis_id", "run_id", "session_id", "state", "start", "end", "duration"]], on=[
                                   "normal_aln_analysis_id", "tumour_aln_analysis_id"], how="left")
 
         new_sheet_data["run_id"] = new_sheet_data["run_id_y"].fillna("")
+        new_sheet_data["session_id"] = new_sheet_data["session_id_y"].fillna("")
         new_sheet_data["state"] = new_sheet_data["state_y"].fillna("")
         new_sheet_data["start"] = new_sheet_data["start_y"].fillna("")
         new_sheet_data["end"] = new_sheet_data["end_y"].fillna("")
@@ -38,6 +40,8 @@ class SangerWorkflowBase(WorkflowBase):
         return new_sheet_data.drop([
             "run_id_x",
             "run_id_y",
+            "session_id_x",
+            "session_id_y",
             "state_y",
             "state_x",
             "start_x",
