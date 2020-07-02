@@ -14,7 +14,7 @@ class SangerWorkflowBase(WorkflowBase):
             "normal_aln_analysis_id": data["parameters"]["normal_aln_analysis_id"],
             "tumour_aln_analysis_id": data["parameters"]["tumour_aln_analysis_id"],
             "run_id": data["runId"],
-            "session_id": data["runId"],
+            "session_id": data["sessionId"],
             "state": data["state"],
             "params": data["parameters"],
             "start": self.esTimestampToLocalDate(data["startTime"]),

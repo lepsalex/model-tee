@@ -13,7 +13,7 @@ class AlignWorkflow(WorkflowBase):
         return {
             "analysis_id": data["parameters"]["analysis_id"],
             "run_id": data["runId"],
-            "session_id": data["runId"],
+            "session_id": data["sessionId"],
             "state": data["state"],
             "params": data["parameters"],
             "start": self.esTimestampToLocalDate(data["startTime"]),
