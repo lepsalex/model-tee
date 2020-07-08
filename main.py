@@ -20,27 +20,27 @@ circuit_breaker = CircuitBreaker(
 )
 
 # Build workflow objects
-# align_workflow = AlignWorkflow({
-#     "sheet_id": os.getenv("ALIGN_SHEET_ID"),
-#     "sheet_range": os.getenv("ALIGN_SHEET_RANGE"),
-#     "wf_url": os.getenv("ALIGN_WF_URL"),
-#     "wf_version": os.getenv("ALIGN_WF_VERSION"),
-#     "max_runs": os.getenv("ALIGN_MAX_RUNS"),
-#     "max_runs_per_dir": os.getenv("ALIGN_MAX_RUNS_PER_DIR"),
-#     "cpus": os.getenv("ALIGN_CPUS"),
-#     "mem": os.getenv("ALIGN_MEM")
-# })
-
-sanger_wgs_workflow = SangerWGSWorkflow({
-    "sheet_id": os.getenv("SANGER_WGS_SHEET_ID"),
-    "sheet_range": os.getenv("SANGER_WGS_SHEET_RANGE"),
-    "wf_url": os.getenv("SANGER_WGS_WF_URL"),
-    "wf_version": os.getenv("SANGER_WGS_WF_VERSION"),
-    "max_runs": os.getenv("SANGER_WGS_MAX_RUNS"),
-    "max_runs_per_dir": os.getenv("SANGER_WGS_MAX_RUNS_PER_DIR"),
-    "cpus": os.getenv("SANGER_WGS_CPUS"),
-    "mem": os.getenv("SANGER_WGS_MEM")
+align_workflow = AlignWorkflow({
+    "sheet_id": os.getenv("ALIGN_SHEET_ID"),
+    "sheet_range": os.getenv("ALIGN_SHEET_RANGE"),
+    "wf_url": os.getenv("ALIGN_WF_URL"),
+    "wf_version": os.getenv("ALIGN_WF_VERSION"),
+    "max_runs": os.getenv("ALIGN_MAX_RUNS"),
+    "max_runs_per_dir": os.getenv("ALIGN_MAX_RUNS_PER_DIR"),
+    "cpus": os.getenv("ALIGN_CPUS"),
+    "mem": os.getenv("ALIGN_MEM")
 })
+
+# sanger_wgs_workflow = SangerWGSWorkflow({
+#     "sheet_id": os.getenv("SANGER_WGS_SHEET_ID"),
+#     "sheet_range": os.getenv("SANGER_WGS_SHEET_RANGE"),
+#     "wf_url": os.getenv("SANGER_WGS_WF_URL"),
+#     "wf_version": os.getenv("SANGER_WGS_WF_VERSION"),
+#     "max_runs": os.getenv("SANGER_WGS_MAX_RUNS"),
+#     "max_runs_per_dir": os.getenv("SANGER_WGS_MAX_RUNS_PER_DIR"),
+#     "cpus": os.getenv("SANGER_WGS_CPUS"),
+#     "mem": os.getenv("SANGER_WGS_MEM")
+# })
 
 # sanger_wxs_workflow = SangerWXSWorkflow({
 #     "sheet_id": os.getenv("SANGER_WXS_SHEET_ID"),
@@ -64,8 +64,8 @@ sanger_wgs_workflow = SangerWGSWorkflow({
 #     "mem": os.getenv("COVID_MEM")
 # })
 
-# runOrUpdateAlign = Utils.methodOrUpdateFactory(align_workflow, "run", circuit_breaker)
-runOrUpdateSangerWGX = Utils.methodOrUpdateFactory(sanger_wgs_workflow, "run", circuit_breaker)
+runOrUpdateAlign = Utils.methodOrUpdateFactory(align_workflow, "run", circuit_breaker)
+# runOrUpdateSangerWGX = Utils.methodOrUpdateFactory(sanger_wgs_workflow, "run", circuit_breaker)
 # appendAndRunCovid = Utils.methodOrUpdateFactory(covid_workflow, "appendAndRun", circuit_breaker)
 
 
@@ -74,8 +74,8 @@ def onWorkflowMessageFunc(message):
 
     if message.value["event"] == "completed":
         print("Workflow event valid, starting configured processes ...")
-        # runOrUpdateAlign(quick=False)
-        runOrUpdateSangerWGX(quick=False)
+        runOrUpdateAlign(quick=False)
+        # runOrUpdateSangerWGX(quick=False)
     else:
         print("Workflow event does not pass filter!")
 
@@ -94,8 +94,8 @@ workflowConsumer = Process(target=Kafka.consumeTopicWith, args=(os.getenv("KAFKA
 # Main
 if __name__ == '__main__':
     # run on start (if we are not in circuit breaker blown state)
-    # runOrUpdateAlign(quick=True)
-    runOrUpdateSangerWGX(quick=True)
+    runOrUpdateAlign(quick=True)
+    # runOrUpdateSangerWGX(quick=True)
 
     # subscribe to workflow events and run
     print("Waiting for workflow events ...")
