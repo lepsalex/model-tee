@@ -28,8 +28,8 @@ class AlignRequest(WorkflowRequestBase):
                 "score_mem": 18
             },
             "seqDataToLaneBam": {
-                "cpus": cpus,
-                "mem": mem
+                "cpus": 4,
+                "mem": 12
             },
             "bwaMemAligner": {
                 "cpus": cpus,
