@@ -1,7 +1,10 @@
 import os
 import pytz
 import uuid
+import random
+import operator
 import pandas as pd
+from collections import Counter
 from random import randint
 from functools import reduce
 from datetime import datetime
@@ -17,6 +20,9 @@ class WorkflowBase(ABC):
     NOT_SCHEDULABLE = ["QUEUED", "INITIALIZING", "RUNNING", "CANCELING"]
     ALREADY_RAN = ["COMPLETE", "SYSTEM_ERROR", "EXECUTOR_ERROR", "UNKNOWN"]
 
+    # 16 work dirs in total following this format
+    WORK_DIRS = {"nfs-{}-c{}".format(x, y) for x in range(1, 5) for y in range(1, 5)}
+
     def __init__(self, config):
         print("Workflow init for wf_url: ", config["wf_url"])
 
@@ -25,9 +31,9 @@ class WorkflowBase(ABC):
         self.sheet_range = config["sheet_range"]
         self.wf_url = config["wf_url"]
         self.wf_version = config["wf_version"]
-        self.max_runs = config["max_runs"]
-        self.max_runs_per_dir = config["max_runs_per_dir"]
-        self.cpus = config["cpus"]
+        self.max_runs = int(config["max_runs"])
+        self.max_runs_per_dir = int(config["max_runs_per_dir"])
+        self.cpus = int(config["cpus"])
         self.mem = config["mem"]
 
         # general env config (not specific to any workflow)
@@ -37,8 +43,9 @@ class WorkflowBase(ABC):
         self.sheet = Sheet(self.sheet_id)
         self.sheet_data = self.sheet.read(self.sheet_range)
         self.gql_query = self.__gqlQueryBuilder()
-        self.run_count = self.__getCurrentRunCount()
         self.work_dirs_in_use = self.__getWorkdirsInUse()
+        self.run_count = self.__getCurrentRunCount()
+        self.work_dir_inventory = self.__buildWorkdirInventory()
         self.index_cols = None
 
     @abstractmethod
@@ -72,7 +79,7 @@ class WorkflowBase(ABC):
         """
         pass
 
-    def run(self, quick=False, global_run_count=0, global_work_dirs_in_use=[]):
+    def run(self, quick=False, global_run_count=0, global_work_dirs_in_use=Counter()):
 
         # Print logogram if not in quick mode
         if not quick:
@@ -133,7 +140,7 @@ class WorkflowBase(ABC):
         print("Writing sheet data to Google Sheets ...")
         self.sheet.write(self.sheet_range, sheet_data)
 
-    def appendAndRun(self, data, quick=False, global_run_count=0, global_work_dirs_in_use=[]):
+    def appendAndRun(self, data, quick=False, global_run_count=0, global_work_dirs_in_use=Counter()):
         # Print logogram if not in quick mode
         if not quick:
             self.__printStartScreen()
@@ -146,7 +153,6 @@ class WorkflowBase(ABC):
         except ValueError as err:
             print("Cannot append row to sheet, duplicate key detected.\n\Data: {}\n\nError: {}".format(row, err))
 
-        
         # get latest run info for sheet data
         self.sheet_data = self.__updateSheetWithWesData()
 
@@ -200,6 +206,9 @@ class WorkflowBase(ABC):
                 sessionId
                 state
                 parameters
+                engineParameters {
+                    workDir
+                }
                 startTime
                 completeTime
                 duration
@@ -217,77 +226,55 @@ class WorkflowBase(ABC):
             df.fillna(value="", inplace=True)
         else:
             df = self.mergeRunsWithSheetData(runs)
-        
-        # Assign random work_dir if not already in sheet
-        df.apply(self.__assignWorkDir, axis=1)
 
         return df
 
-    def __assignWorkDir(self, row):
-        """
-        If no "work_dir" specified in sheet, will randomly assign a work_dir
-        """
-        if not row["work_dir"]:
-            row["work_dir"] = "nfs-{}-c{}".format(randint(1,4), randint(1,4))
-        
-        return row
-
     def __getCurrentRunCount(self):
         """
-        Get count of currently running jobs for THIS workflow
+        Get count of currently running or scheduled jobs for THIS workflow
         """
-        if self.sheet_data.size > 0:
-            return self.sheet_data.groupby("state")["state"].count().get("RUNNING", 0)
-        else:
-            return 0
+        return sum(self.work_dirs_in_use.values())
 
     def __computeRunAvailability(self, global_run_count):
         """
-        Compute job availability (ALIGN_MAX_RUNS - Current Running Jobs (__getCurrentRunCount))
+        Compute job availability (ALIGN_WGS_MAX_RUNS - Current Running Jobs (__getCurrentRunCount))
         """
-        return int(self.max_runs) - (int(self.__getCurrentRunCount()) + global_run_count)
+        return self.max_runs - (self.__getCurrentRunCount() + global_run_count)
+
+    def __buildWorkdirInventory(self):
+        return Counter({work_dir: self.max_runs_per_dir for work_dir in self.WORK_DIRS if work_dir not in self.tainted_dir_list})
 
     def __getWorkdirsInUse(self):
         if self.sheet_data.size > 0:
-            return self.sheet_data[self.sheet_data["state"] == "RUNNING"]["work_dir"].values
+            work_dirs_in_use = self.sheet_data.loc[self.sheet_data["state"].isin(self.NOT_SCHEDULABLE)].groupby(["work_dir"])
+            return Counter(dict((x, y) for x, y in work_dirs_in_use.size().iteritems()))
         else:
-            return []
+            return {}
 
-    def __computeUnavailableWorkDirs(self, acc, curr):
-        """
-        Computes list of unavailable work_dir(s) as a list of dirs
-        have >= X jobs running where X is the max_runs_per_dir param
-        """
-        if (curr[1] >= int(self.max_runs_per_dir)):
-            acc.append(curr[0])
+    def __assignWorkDir(self, row, available_work_dirs):
+        idx = int(row.name)
+        if (idx < len(available_work_dirs)):
+            row["work_dir"] = available_work_dirs[idx]
+            return row
 
-        return acc
+    def __startJobsOnAvailableNFS(self, run_availability, global_work_dirs_in_use):
+        # get directories that are in use for this workflow combined with global work_dir usage
+        work_dirs_in_use = self.__getWorkdirsInUse() + global_work_dirs_in_use
 
-    def __startJobsOnAvailableNFS(self, run_availability, global_work_dirs_in_use=[]):
-        # get directories that are in use for this workflow
-        not_schedulable_work_dirs = self.sheet_data.loc[self.sheet_data["state"].isin(self.NOT_SCHEDULABLE)].groupby(["work_dir"])
+        # subtract work_dirs_in_use Counter from self.work_dir_inventory to get available work_dirs with counts
+        available_work_dirs = self.work_dir_inventory - work_dirs_in_use
 
-        # get group size and pass to reduce to get unavailable directories (# jobs in dir >= max_runs_per_dir)
-        not_schedulable_work_dirs = reduce(self.__computeUnavailableWorkDirs, not_schedulable_work_dirs.size().iteritems(), [])
+        # turn available_work_dirs into randomly ordered list of work_dirs
+        # with duplicates representing count of availability
+        available_work_dirs = reduce(operator.add, [[work_dir for count in range(count)] for work_dir, count in available_work_dirs.items()])
+        random.shuffle(available_work_dirs)
 
-        # combine with globally used work_dirs (if any)
-        not_schedulable_work_dirs = set(not_schedulable_work_dirs + global_work_dirs_in_use)
+        # get next analyses by filtering out any analyses that have already been completed or are
+        # currently running and taking the next n rows from that group, where n == run_availability
+        eligible_analyses = self.sheet_data.loc[~self.sheet_data["state"].isin(self.ALREADY_RAN + self.NOT_SCHEDULABLE)].head(run_availability)
 
-        # filter available directories (set of all dirs minus dirs in use + tainted dirs from env)
-        unavailable_dir = {y for x in [not_schedulable_work_dirs, self.tainted_dir_list] for y in x if y}
-        eligible_workdirs = self.sheet_data.loc[~self.sheet_data["work_dir"].isin(unavailable_dir)]
-
-        # filter out any analyses that have already been completed or are currently running
-        eligible_analyses = eligible_workdirs.loc[~self.sheet_data["state"].isin(self.ALREADY_RAN + self.NOT_SCHEDULABLE)]
-
-        # NOTE: ".sample(...)" is used below in order pull a random work_dir from the list otherwise
-        # we would always be scheduling primarily on NFS-1/NFS-2 until all those runs were complete and then on
-        # NFS-3/NFS-4, not that it would necessarily be a problem but would like to see more normal distribution
-
-        # get one analysis per eligible work directory
-        # (limit to lesser of: total amount of runs possible vs. run_availability)
-        next_runs = eligible_analyses.groupby("work_dir").first().reset_index()
-        next_runs = next_runs.sample(min(run_availability, next_runs.shape[0]))
+        # assign work_dirs and drop any analyses that don't get a work_dir (once all are assigned from available_work_dirs)
+        next_runs = eligible_analyses.apply(self.__assignWorkDir, axis=1, available_work_dirs=available_work_dirs).dropna(subset=["work_dir"])
 
         # build run requests (iterrows returns tuple, [1] is where the data is)
         requests = [self.buildRunRequests(next_run[1], resume=False) for next_run in next_runs.iterrows()]
