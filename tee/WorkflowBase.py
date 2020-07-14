@@ -88,6 +88,10 @@ class WorkflowBase(ABC):
         # get latest run info for sheet data
         self.sheet_data = self.__updateSheetWithWesData()
 
+        # Update state
+        self.run_count = self.__getCurrentRunCount()
+        self.work_dirs_in_use = self.__getWorkdirsInUse()
+
         # Compute job availability
         run_availability = self.__computeRunAvailability(global_run_count)
 
