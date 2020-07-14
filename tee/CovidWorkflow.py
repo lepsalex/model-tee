@@ -12,6 +12,7 @@ class CovidWorkflow(WorkflowBase):
     def transformRunData(self, data):
         return {
             "analysis_id": data["parameters"]["analysis_id"],
+            "work_dir": data["engineParameters"]["workDir"].split("/")[1],
             "run_id": data["runId"],
             "session_id": data["sessionId"],
             "state": data["state"],
@@ -26,9 +27,10 @@ class CovidWorkflow(WorkflowBase):
         latest_runs = runs.sort_values(["start"], ascending=False).groupby("analysis_id").head(1)
 
         # Update sheet data
-        new_sheet_data = pd.merge(self.sheet_data, latest_runs[["analysis_id", "run_id", "session_id",
+        new_sheet_data = pd.merge(self.sheet_data, latest_runs[["analysis_id", "work_dir", "run_id", "session_id",
                                                                 "state", "start", "end", "duration"]], on="analysis_id", how="left")
 
+        new_sheet_data["work_dir"] = new_sheet_data["work_dir_y"].fillna("")
         new_sheet_data["run_id"] = new_sheet_data["run_id_y"].fillna("")
         new_sheet_data["session_id"] = new_sheet_data["session_id_y"].fillna("")
         new_sheet_data["state"] = new_sheet_data["state_y"].fillna("")
@@ -37,6 +39,8 @@ class CovidWorkflow(WorkflowBase):
         new_sheet_data["duration"] = new_sheet_data["duration_y"].fillna("")
 
         return new_sheet_data.drop([
+            "work_dir_x",
+            "work_dir_y",
             "run_id_x",
             "run_id_y",
             "session_id_x",
