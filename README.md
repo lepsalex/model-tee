@@ -6,13 +6,13 @@ Very basic workflow orchestration/automation using the Google Sheets API and the
 2. Model-tee initiates a workflow given some params (from .env)
 ```
     align_workflow = AlignWorkflow({
-        "sheet_id": os.getenv("ALIGN_SHEET_ID"),
-        "sheet_range": os.getenv("ALIGN_SHEET_RANGE"),
-        "wf_url": os.getenv("ALIGN_WF_URL"),
-        "wf_version": os.getenv("ALIGN_WF_VERSION"),
-        "max_runs": os.getenv("ALIGN_MAX_RUNS"),
-        "cpus": os.getenv("ALIGN_CPUS"),
-        "mem": os.getenv("ALIGN_MEM")
+        "sheet_id": os.getenv("ALIGN_WGS_SHEET_ID"),
+        "sheet_range": os.getenv("ALIGN_WGS_SHEET_RANGE"),
+        "wf_url": os.getenv("ALIGN_WGS_WF_URL"),
+        "wf_version": os.getenv("ALIGN_WGS_WF_VERSION"),
+        "max_runs": os.getenv("ALIGN_WGS_MAX_RUNS"),
+        "cpus": os.getenv("ALIGN_WGS_CPUS"),
+        "mem": os.getenv("ALIGN_WGS_MEM")
     })
 ```
 3. Model-tee reads sheet (Google API) into a dataframe (Pandas)
