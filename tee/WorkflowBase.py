@@ -271,7 +271,7 @@ class WorkflowBase(ABC):
 
         # get next analyses by filtering out any analyses that have already been completed or are
         # currently running and taking the next n rows from that group, where n == run_availability
-        eligible_analyses = self.sheet_data.loc[~self.sheet_data["state"].isin(self.ALREADY_RAN + self.NOT_SCHEDULABLE)].head(run_availability)
+        eligible_analyses = self.sheet_data.loc[~self.sheet_data["state"].isin(self.ALREADY_RAN + self.NOT_SCHEDULABLE)].head(run_availability).reset_index()
 
         # assign work_dirs and drop any analyses that don't get a work_dir (once all are assigned from available_work_dirs)
         next_runs = eligible_analyses.apply(self.__assignWorkDir, axis=1, available_work_dirs=available_work_dirs).dropna(subset=["work_dir"])
