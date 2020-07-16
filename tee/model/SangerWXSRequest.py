@@ -36,17 +36,35 @@ class SangerWXSRequest(WorkflowRequestBase):
                 "ref_snv_indel_tar": "/{}/reference/sanger-variant-calling/SNV_INDEL_ref_GRCh38_hla_decoy_ebv-fragment.tar.gz".format(work_dir)
             },
             "generateBas": {
+                "cpus": 6,
+                "mem": 32,
                 "ref_genome_fa": "/{}/reference/GRCh38_hla_decoy_ebv/GRCh38_hla_decoy_ebv.fa".format(work_dir)
             },
             "repackSangerResults": {
                 "cpus": 2,
                 "mem": 4
             },
-            "repack-sanger-results": {
+            "prepSangerSupplement": {
+                "cpus": 2,
+                "mem": 8
+            },
+            "cavemanVcfFix": {
+                "cpus": 2,
+                "mem": 16
+            },
+            "extractSangerCall": {
                 "cpus": 2,
                 "mem": 4
             },
-            "upload": {
+            "payloadGenVariantCall": {
+                "cpus": 2,
+                "mem": 8
+            },
+            "prepSangerQc": {
+                "cpus": 2,
+                "mem": 8
+            },
+            "uploadVariant": {
                 "song_cpus": 2,
                 "song_mem": 2,
                 "score_cpus": 8,
