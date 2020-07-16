@@ -24,29 +24,40 @@ class WorkflowBase(ABC):
     WORK_DIRS = {"nfs-{}-c{}".format(x, y) for x in range(1, 5) for y in range(1, 5)}
 
     def __init__(self, config):
-        print("Workflow init for wf_url: ", config["wf_url"])
-
-        # config
-        self.sheet_id = config["sheet_id"]
-        self.sheet_range = config["sheet_range"]
-        self.wf_url = config["wf_url"]
-        self.wf_version = config["wf_version"]
+        # minimum required attributes
         self.max_runs = int(config["max_runs"])
-        self.max_runs_per_dir = int(config["max_runs_per_dir"])
-        self.cpus = int(config["cpus"])
-        self.mem = config["mem"]
+        self.sheet_range = config["sheet_range"]
 
-        # general env config (not specific to any workflow)
-        self.tainted_dir_list = os.getenv("TAINTED_DIR_LIST", "").split(",")
+        # Running as main, recall, or update
+        if (self.max_runs > 0 or self.max_runs == -1):
+            print("Workflow init for wf_url: ", config["wf_url"])
 
-        # initial state
-        self.sheet = Sheet(self.sheet_id)
-        self.sheet_data = self.sheet.read(self.sheet_range)
-        self.gql_query = self.__gqlQueryBuilder()
-        self.work_dirs_in_use = self.__getWorkdirsInUse()
-        self.run_count = self.__getCurrentRunCount()
-        self.work_dir_inventory = self.__buildWorkdirInventory()
-        self.index_cols = None
+            # common wf config
+            self.sheet_id = config["sheet_id"]
+            self.wf_url = config["wf_url"]
+            self.wf_version = config["wf_version"]
+            self.cpus = int(config["cpus"])
+            self.mem = config["mem"]
+            self.index_cols = None
+
+            # initial state
+            self.sheet = Sheet(self.sheet_id)
+            self.sheet_data = self.sheet.read(self.sheet_range)
+            self.gql_query = self.__gqlQueryBuilder()
+
+        # Running as main ONLY
+        if (self.max_runs > 0):
+            self.max_runs_per_dir = int(config["max_runs_per_dir"])
+            self.tainted_dir_list = os.getenv("TAINTED_DIR_LIST", "").split(",")
+            self.work_dirs_in_use = self.__getWorkdirsInUse()
+            self.run_count = self.__getCurrentRunCount()
+            self.work_dir_inventory = self.__buildWorkdirInventory()
+
+        # WF Disabled
+        if (self.max_runs == 0):
+            print("Workflow disabled for wf_url: ", config["wf_url"])
+            self.work_dirs_in_use = Counter()
+            self.run_count = 0
 
     @abstractmethod
     def transformRunData(self, gql_run):
@@ -80,6 +91,9 @@ class WorkflowBase(ABC):
         pass
 
     def run(self, quick=False, global_run_count=0, global_work_dirs_in_use=Counter()):
+        # exit if max_runs is set to 0 or -1
+        if self.max_runs <= 0:
+            return
 
         # Print logogram if not in quick mode
         if not quick:
@@ -253,7 +267,7 @@ class WorkflowBase(ABC):
             work_dirs_in_use = self.sheet_data.loc[self.sheet_data["state"].isin(self.NOT_SCHEDULABLE)].groupby(["work_dir"])
             return Counter(dict((x, y) for x, y in work_dirs_in_use.size().iteritems()))
         else:
-            return {}
+            return Counter()
 
     def __assignWorkDir(self, row, available_work_dirs):
         idx = int(row.name)
