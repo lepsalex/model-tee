@@ -27,14 +27,14 @@ class WorkflowBase(ABC):
         # minimum required attributes
         self.max_runs = int(config["max_runs"])
         self.sheet_range = config["sheet_range"]
+        self.wf_url = config["wf_url"]
 
         # Running as main, recall, or update
         if (self.max_runs > 0 or self.max_runs == -1):
-            print("Workflow init for wf_url: ", config["wf_url"])
+            print("Workflow init for sheet_range: {}, wf_url: {}".format(self.sheet_range, self.wf_url))
 
             # common wf config
             self.sheet_id = config["sheet_id"]
-            self.wf_url = config["wf_url"]
             self.wf_version = config["wf_version"]
             self.cpus = int(config["cpus"])
             self.mem = config["mem"]
@@ -55,7 +55,7 @@ class WorkflowBase(ABC):
 
         # WF Disabled
         if (self.max_runs == 0):
-            print("Workflow disabled for wf_url: ", config["wf_url"])
+            print("Workflow disabled for sheet_range: {}, wf_url: {}".format(self.sheet_range, self.wf_url))
             self.work_dirs_in_use = Counter()
             self.run_count = 0
 

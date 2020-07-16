@@ -23,6 +23,8 @@ Very basic workflow orchestration/automation using the Google Sheets API and the
 
 Is this perfect, no there are any number of potential pitfalls and problems with using a Google sheets as essentially on of your databases and UI's. Does it work? Absolutely and has already successfully completed hundreds if not thousands of runs.
 
+*Usage Note:* if you set `max_runs` to 0, it will disable the workflow, set to `-1` and you will be able to use in `recall.py` but will still be disabled from `main.py`.
+
 #### Could this project be easily adapted to someone elses needs?
 If you are running OICR RDPC software this would be extremely easy to adapt for your specific workflows. If you have some other open-source WES or even a proprietary system it may require additional modification but really the core concept is that we tie workflow runs (WES) with some metadata system (SONG) on some key (usually analysisId).
 

@@ -59,7 +59,7 @@ sanger_wxs_workflow = SangerWXSWorkflow({
     "wf_url": os.getenv("SANGER_WXS_WF_URL"),
     "wf_version": os.getenv("SANGER_WXS_WF_VERSION"),
     "max_runs": os.getenv("SANGER_WXS_MAX_RUNS"),
-    "max_runs_per_dir": os.getenv("SANGER_WxS_MAX_RUNS_PER_DIR"),
+    "max_runs_per_dir": os.getenv("SANGER_WXS_MAX_RUNS_PER_DIR"),
     "cpus": os.getenv("SANGER_WXS_CPUS"),
     "mem": os.getenv("SANGER_WXS_MEM")
 })
