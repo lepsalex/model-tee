@@ -31,8 +31,6 @@ class WorkflowBase(ABC):
 
         # Running as main, recall, or update
         if (self.max_runs > 0 or self.max_runs == -1):
-            print("Workflow init for sheet_range: {}, wf_url: {}".format(self.sheet_range, self.wf_url))
-
             # common wf config
             self.sheet_id = config["sheet_id"]
             self.wf_version = config["wf_version"]
@@ -53,11 +51,22 @@ class WorkflowBase(ABC):
             self.run_count = self.__getCurrentRunCount()
             self.work_dir_inventory = self.__buildWorkdirInventory()
 
+        # Resume Mode OR Disabled
+        if (self.max_runs == -1 or self.max_runs == 0):
+            self.work_dirs_in_use = Counter()
+            self.run_count = 0
+
+         # Main mode
+        if (self.max_runs > 0):
+            print("Workflow automation running for sheet_range: {}, wf_url: {}".format(self.sheet_range, self.wf_url))
+
+        # Resume mode
+        if (self.max_runs == -1):
+            print("Workflow for sheet_range: {}, wf_url: {} can be used in RESUME mode only via recall.py!".format(self.sheet_range, self.wf_url))
+
         # WF Disabled
         if (self.max_runs == 0):
             print("Workflow disabled for sheet_range: {}, wf_url: {}".format(self.sheet_range, self.wf_url))
-            self.work_dirs_in_use = Counter()
-            self.run_count = 0
 
     @abstractmethod
     def transformRunData(self, gql_run):

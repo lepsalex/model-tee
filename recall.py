@@ -13,7 +13,7 @@ align_wgs_workflow = AlignWorkflow({
     "sheet_range": os.getenv("ALIGN_WGS_SHEET_RANGE"),
     "wf_url": os.getenv("ALIGN_WGS_WF_URL"),
     "wf_version": os.getenv("ALIGN_WGS_WF_VERSION"),
-    "max_runs": 0,
+    "max_runs": -1,
     "max_runs_per_dir": -1,
     "cpus": os.getenv("ALIGN_WGS_CPUS"),
     "mem": os.getenv("ALIGN_WGS_MEM")
@@ -24,7 +24,7 @@ align_wxs_workflow = AlignWorkflow({
     "sheet_range": os.getenv("ALIGN_WXS_SHEET_RANGE"),
     "wf_url": os.getenv("ALIGN_WXS_WF_URL"),
     "wf_version": os.getenv("ALIGN_WXS_WF_VERSION"),
-    "max_runs": 0,
+    "max_runs": -1,
     "max_runs_per_dir": -1,
     "cpus": os.getenv("ALIGN_WXS_CPUS"),
     "mem": os.getenv("ALIGN_WXS_MEM")
@@ -36,7 +36,7 @@ sanger_wgs_workflow = SangerWGSWorkflow({
     "sheet_range": os.getenv("SANGER_WGS_SHEET_RANGE"),
     "wf_url": os.getenv("SANGER_WGS_WF_URL"),
     "wf_version": os.getenv("SANGER_WGS_WF_VERSION"),
-    "max_runs": 0,
+    "max_runs": -1,
     "max_runs_per_dir": -1,
     "cpus": os.getenv("SANGER_WGS_CPUS"),
     "mem": os.getenv("SANGER_WGS_MEM")
@@ -65,5 +65,5 @@ recall_list = []
 # sanger_wgs_workflow.update()
 # sanger_wgs_workflow.recall(recall_list)
 
-sanger_wxs_workflow.update()
+# sanger_wxs_workflow.update()
 # sanger_wxs_workflow.recall(recall_list)
