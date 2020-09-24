@@ -24,8 +24,8 @@ class SangerWXSRequest(WorkflowRequestBase):
             "download": {
                 "song_cpus": 2,
                 "song_mem": 2,
-                "score_cpus": 8,
-                "score_mem": 18
+                "score_cpus": 4,
+                "score_mem": 10
             },
             "sangerWxsVariantCaller": {
                 "cpus": cpus,
@@ -66,8 +66,8 @@ class SangerWXSRequest(WorkflowRequestBase):
             "uploadVariant": {
                 "song_cpus": 2,
                 "song_mem": 2,
-                "score_cpus": 8,
-                "score_mem": 18
+                "score_cpus": 4,
+                "score_mem": 10
             },
             "cleanup": True
         }
