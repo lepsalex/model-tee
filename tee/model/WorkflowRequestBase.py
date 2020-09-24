@@ -9,7 +9,6 @@ class WorkflowRequestBase(ABC):
             "SCORE_URL": os.getenv("SCORE_URL"),
             "INTERMEDIATE_SONG_URL": os.getenv("INTERMEDIATE_SONG_URL"),
             "ICGC_SCORE_URL": os.getenv("ICGC_SCORE_URL"),
-            "SONG_API_TOKEN": os.getenv("SONG_API_TOKEN"),
             "ICGC_SCORE_TOKEN": os.getenv("ICGC_SCORE_API_TOKEN")
         }
 

@@ -19,7 +19,6 @@ class SangerWXSRequest(WorkflowRequestBase):
             "tumour_aln_analysis_id": tumour_aln_analysis_id,
             "song_url": song_score_config["SONG_URL"],
             "score_url": song_score_config["SCORE_URL"],
-            "api_token": song_score_config["SONG_API_TOKEN"],
             "cpus": 2,
             "mem": 2,
             "download": {
