@@ -14,7 +14,7 @@ class WorkflowRequestBase(ABC):
 
         self.workflow_url = workflow_url
         self.wp_config = self.buildWorkflowParams(run_config, self.song_score_config)
-        self.wep_config = WorkflowRequestBase.buildEngineParams(run_config)
+        self.wep_config = WorkflowRequestBase.buildEngineParams(run_config, os.path.basename(self.workflow_url).split(".")[0])
 
     def data(self):
         """
@@ -34,7 +34,7 @@ class WorkflowRequestBase(ABC):
         pass
 
     @classmethod
-    def buildEngineParams(cls, run_config):
+    def buildEngineParams(cls, run_config, workflow_name):
         # return None of not specified
         if run_config == None:
             return None
@@ -42,7 +42,7 @@ class WorkflowRequestBase(ABC):
         engine_params = {}
 
         WorkflowRequestBase.addFormattedStringValueIfValue(engine_params, "launch_dir", "/%s/launch", run_config.get("work_dir", None))
-        WorkflowRequestBase.addFormattedStringValueIfValue(engine_params, "project_dir", "/%s/versioned-projects/%s/", run_config.get("work_dir", None), run_config.get("revision", "master"))
+        WorkflowRequestBase.addFormattedStringValueIfValue(engine_params, "project_dir", "/%s/projects/%s/%s/", run_config.get("work_dir", None), workflow_name, run_config.get("revision", "master"))
         WorkflowRequestBase.addFormattedStringValueIfValue(engine_params, "work_dir", "/%s/work", run_config.get("work_dir", None))
 
         WorkflowRequestBase.addValueIfValue(engine_params, "revision", run_config.get("revision", "master"))
