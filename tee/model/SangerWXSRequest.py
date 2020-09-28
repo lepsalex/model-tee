@@ -19,14 +19,13 @@ class SangerWXSRequest(WorkflowRequestBase):
             "tumour_aln_analysis_id": tumour_aln_analysis_id,
             "song_url": song_score_config["SONG_URL"],
             "score_url": song_score_config["SCORE_URL"],
-            "api_token": song_score_config["SONG_API_TOKEN"],
             "cpus": 2,
             "mem": 2,
             "download": {
                 "song_cpus": 2,
                 "song_mem": 2,
-                "score_cpus": 8,
-                "score_mem": 18
+                "score_cpus": 4,
+                "score_mem": 10
             },
             "sangerWxsVariantCaller": {
                 "cpus": cpus,
@@ -67,8 +66,8 @@ class SangerWXSRequest(WorkflowRequestBase):
             "uploadVariant": {
                 "song_cpus": 2,
                 "song_mem": 2,
-                "score_cpus": 8,
-                "score_mem": 18
+                "score_cpus": 4,
+                "score_mem": 10
             },
             "cleanup": True
         }

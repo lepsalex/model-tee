@@ -17,15 +17,14 @@ class AlignRequest(WorkflowRequestBase):
             "analysis_id": analysis_id,
             "song_url": song_score_config["SONG_URL"],
             "score_url": song_score_config["SCORE_URL"],
-            "api_token": song_score_config["SONG_API_TOKEN"],
             "ref_genome_fa": "/{}/reference/GRCh38_hla_decoy_ebv/GRCh38_hla_decoy_ebv.fa".format(work_dir),
             "cpus": 2,
             "mem": 4,
             "download": {
                 "song_cpus": 2,
                 "song_mem": 2,
-                "score_cpus": 8,
-                "score_mem": 18
+                "score_cpus": 4,
+                "score_mem": 10
             },
             "seqDataToLaneBam": {
                 "cpus": 4,
@@ -62,8 +61,8 @@ class AlignRequest(WorkflowRequestBase):
             "uploadAlignment": {
                 "song_cpus": 2,
                 "song_mem": 2,
-                "score_cpus": 8,
-                "score_mem": 18
+                "score_cpus": 4,
+                "score_mem": 10
             },
             "uploadQc": {
                 "song_cpus": 2,

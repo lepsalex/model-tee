@@ -19,18 +19,18 @@ class SangerWGSRequest(WorkflowRequestBase):
             "tumour_aln_analysis_id": tumour_aln_analysis_id,
             "song_url": song_score_config["SONG_URL"],
             "score_url": song_score_config["SCORE_URL"],
-            "api_token": song_score_config["SONG_API_TOKEN"],
             "cpus": 2,
             "mem": 6,
             "download": {
                 "song_cpus": 2,
                 "song_mem": 2,
-                "score_cpus": 8,
-                "score_mem": 18
+                "score_cpus": 4,
+                "score_mem": 10
             },
             "sangerWgsVariantCaller": {
                 "cpus": cpus,
                 "mem": mem,
+                "pindelcpu": 3,
                 "ref_genome_tar": "/{}/reference/sanger-variant-calling/core_ref_GRCh38_hla_decoy_ebv.tar.gz".format(work_dir),
                 "vagrent_annot": "/{}/reference/sanger-variant-calling/VAGrENT_ref_GRCh38_hla_decoy_ebv_ensembl_91.tar.gz".format(work_dir),
                 "ref_snv_indel_tar": "/{}/reference/sanger-variant-calling/SNV_INDEL_ref_GRCh38_hla_decoy_ebv-fragment.tar.gz".format(work_dir),
@@ -69,8 +69,8 @@ class SangerWGSRequest(WorkflowRequestBase):
             "upload": {
                 "song_cpus": 2,
                 "song_mem": 2,
-                "score_cpus": 8,
-                "score_mem": 18
+                "score_cpus": 4,
+                "score_mem": 10
             },
             "cleanup": True
         }

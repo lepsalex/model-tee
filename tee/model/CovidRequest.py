@@ -17,7 +17,6 @@ class CovidRequest(WorkflowRequestBase):
             "analysis_id": analysis_id,
             "song_url": song_score_config["SONG_URL"],
             "score_url": song_score_config["SCORE_URL"],
-            "api_token": song_score_config["SONG_API_TOKEN"],
             "ref_genome_fa": "/{}/reference/COVID-PLACEHOLDER/COVID-PLACEHOLDER.fa".format(work_dir),
             "cpus": cpus,
             "mem": mem,
