@@ -13,6 +13,9 @@ class Utils():
         method_to_call = getattr(wf, method_name)
 
         def func(**kwargs):
+            if wf.max_runs == 0:
+                return
+
             cb.update()
     
             if not cb.is_blown:
