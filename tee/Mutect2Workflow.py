@@ -1,9 +1,9 @@
 import pandas as pd
 from tee.WorkflowBase import WorkflowBase
-from tee.model.CovidRequest import CovidRequest
+from tee.model.Mutect2Request import Mutect2Request
 
 
-class CovidWorkflow(WorkflowBase):
+class Mutect2Workflow(WorkflowBase):
 
     def __init__(self, config):
         super().__init__(config)
@@ -68,7 +68,7 @@ class CovidWorkflow(WorkflowBase):
         if resume:
             config["resume"] = run["session_id"]
 
-        return CovidRequest(self.wf_url, config)
+        return Mutect2Request(self.wf_url, config)
 
     def transformEventData(self, event_data):
         return {

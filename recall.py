@@ -2,6 +2,7 @@ import os
 from tee.AlignWorkflow import AlignWorkflow
 from tee.SangerWGSWorkflow import SangerWGSWorkflow
 from tee.SangerWXSWorkflow import SangerWXSWorkflow
+from tee.Mutect2Workflow import Mutect2Workflow
 from dotenv import load_dotenv
 
 # load env from file if present
@@ -53,6 +54,17 @@ sanger_wxs_workflow = SangerWXSWorkflow({
     "mem": os.getenv("SANGER_WXS_MEM")
 })
 
+mutect2_workflow = Mutect2Workflow({
+    "sheet_id": os.getenv("MUTECT2_SHEET_ID"),
+    "sheet_range": os.getenv("MUTECT2_SHEET_RANGE"),
+    "wf_url": os.getenv("MUTECT2_WF_URL"),
+    "wf_version": os.getenv("MUTECT2_WF_VERSION"),
+    "max_runs": -1,
+    "max_runs_per_dir": -1,
+    "cpus": os.getenv("MUTECT2_CPUS"),
+    "mem": os.getenv("MUTECT2_MEM")
+})
+
 # Recall Script (to be run locally only!)
 recall_list = []
 
@@ -67,3 +79,6 @@ recall_list = []
 
 # sanger_wxs_workflow.update()
 # sanger_wxs_workflow.recall(recall_list)
+
+# mutect2_workflow.update()
+# mutect2_workflow.recall(recall_list)

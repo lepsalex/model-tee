@@ -6,7 +6,7 @@ from service.CircuitBreaker import CircuitBreaker
 from tee.AlignWorkflow import AlignWorkflow
 from tee.SangerWGSWorkflow import SangerWGSWorkflow
 from tee.SangerWXSWorkflow import SangerWXSWorkflow
-from tee.CovidWorkflow import CovidWorkflow
+from tee.Mutect2Workflow import Mutect2Workflow
 from tee.Utils import Utils
 from dotenv import load_dotenv
 
