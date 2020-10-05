@@ -1,9 +1,9 @@
 import pandas as pd
-from tee.SangerWorkflowBase import SangerWorkflowBase
+from tee.VariantCallerWorkflowBase import VariantCallerWorkflowBase
 from tee.model.Mutect2Request import Mutect2Request
 
 
-class Mutect2Workflow(SangerWorkflowBase):
+class Mutect2Workflow(VariantCallerWorkflowBase):
 
     def __init__(self, config):
         super().__init__(config)

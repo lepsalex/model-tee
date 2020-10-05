@@ -1,9 +1,9 @@
 import pandas as pd
-from tee.SangerWorkflowBase import SangerWorkflowBase
+from tee.VariantCallerWorkflowBase import VariantCallerWorkflowBase
 from tee.model.SangerWXSRequest import SangerWXSRequest
 
 
-class SangerWXSWorkflow(SangerWorkflowBase):
+class SangerWXSWorkflow(VariantCallerWorkflowBase):
 
     def __init__(self, config):
         super().__init__(config)

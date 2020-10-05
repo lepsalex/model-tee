@@ -1,9 +1,8 @@
 import pandas as pd
 from tee.WorkflowBase import WorkflowBase
-from tee.model.AlignRequest import AlignRequest
 
 
-class SangerWorkflowBase(WorkflowBase):
+class VariantCallerWorkflowBase(WorkflowBase):
 
     def __init__(self, config):
         super().__init__(config)

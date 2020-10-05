@@ -23,7 +23,7 @@ class Mutect2Request(WorkflowRequestBase):
             "mutect2_scatter_interval_files": "/{}/reference/gatk-resources/mutect2.scatter_by_chr/chr*.interval_list".format(work_dir),
             "bqsr_apply_grouping_file": "/{}/reference/gatk-resources/bqsr.sequence_grouping_with_unmapped.grch38_hla_decoy_ebv.csv".format(work_dir),
             "bqsr_recal_grouping_file": "/{}/reference/gatk-resources/bqsr.sequence_grouping.grch38_hla_decoy_ebv.csv".format(work_dir),
-            "germline_resource_vcfs": ["/{}/reference/gatk-resources/af-only-gnomad.pass-only.hg38.vcf.gz".format](work_dir),
+            "germline_resource_vcfs": ["/{}/reference/gatk-resources/af-only-gnomad.pass-only.hg38.vcf.gz".format(work_dir)],
             "contamination_variants": "/{}/reference/gatk-resources/af-only-gnomad.pass-only.biallelic.snp.hg38.vcf.gz".format(work_dir),
             "panel_of_normals": "/{}/reference/gatk-resources/1000g_pon.hg38.vcf.gz".format(work_dir),
             "cpus": cpus,
