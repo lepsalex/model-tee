@@ -4,6 +4,7 @@ import uuid
 import random
 import operator
 import pandas as pd
+from enum import Enum
 from collections import Counter
 from random import randint
 from functools import reduce
@@ -228,7 +229,7 @@ class WorkflowBase(ABC):
     def __gqlQueryBuilder(self):
         return gql('''
         {
-            runs(page: {from: 0, size: 1000}, filter: {repository:\"%s\"} ) {
+            runs(page: {from: 0, size: 10000}, filter: {repository:\"%s\"} ) {
                 runId
                 sessionId
                 state
@@ -252,6 +253,13 @@ class WorkflowBase(ABC):
             print("Warning: no runs returned, defaulting to existing sheet data!")
             df.fillna(value="", inplace=True)
         else:
+            # apply state categorical data to runs
+            runs["state"] = pd.Categorical(runs['state'], [str(i) for i in WorkflowState], ordered=True)
+
+            # get only latest runs sorted by state THEN start
+            runs = runs.sort_values(["state", "start"], ascending=[True, False])
+
+            # merge sorted RDPC data with sheet
             df = self.mergeRunsWithSheetData(runs)
 
         return df
@@ -344,3 +352,14 @@ class WorkflowBase(ABC):
         for line in logo_gram:
             print(line)
             sleep(0.7)
+
+
+class WorkflowState(Enum):
+    RUNNING = 1
+    COMPLETE = 2
+    EXECUTOR_ERROR = 3
+    FAILED = 4
+    NA = 5
+
+    def __str__(self):
+        return self.name
