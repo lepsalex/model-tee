@@ -1,9 +1,9 @@
 import pandas as pd
 from tee.VariantCallerWorkflowBase import VariantCallerWorkflowBase
-from tee.model.SangerWXSRequest import SangerWXSRequest
+from tee.model.Mutect2Request import Mutect2Request
 
 
-class SangerWXSWorkflow(VariantCallerWorkflowBase):
+class Mutect2Workflow(VariantCallerWorkflowBase):
 
     def __init__(self, config):
         super().__init__(config)
@@ -22,4 +22,4 @@ class SangerWXSWorkflow(VariantCallerWorkflowBase):
         if resume:
             config["resume"] = run["session_id"]
 
-        return SangerWXSRequest(self.wf_url, config)
+        return Mutect2Workflow(self.wf_url, config)
