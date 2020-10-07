@@ -1,6 +1,5 @@
 import os
 from multiprocessing import Process
-from kafka import KafkaConsumer
 from service.Kafka import Kafka
 from service.CircuitBreaker import CircuitBreaker
 from tee.AlignWorkflow import AlignWorkflow
