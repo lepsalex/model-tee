@@ -12,6 +12,7 @@ class Mutect2Request(WorkflowRequestBase):
         work_dir = run_config["work_dir"]
         cpus = run_config["cpus"]
         mem = run_config["mem"]
+        bqsr = run_config["bqsr"]
 
         return {
             "song_url": song_score_config["SONG_URL"],
@@ -37,6 +38,7 @@ class Mutect2Request(WorkflowRequestBase):
             "calculateContamination": {
                 "mem": 10
             },
+            "perform_bqsr": bqsr,
             "cleanup": True
         }
 

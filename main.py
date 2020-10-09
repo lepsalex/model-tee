@@ -63,13 +63,41 @@ sanger_wxs_workflow = SangerWXSWorkflow({
     "mem": os.getenv("SANGER_WXS_MEM")
 })
 
+mutect2_workflow = SangerWXSWorkflow({
+    "sheet_id": os.getenv("MUTECT2_SHEET_ID"),
+    "sheet_range": os.getenv("MUTECT2_SHEET_RANGE"),
+    "wf_url": os.getenv("MUTECT2_WF_URL"),
+    "wf_version": os.getenv("MUTECT2_WF_VERSION"),
+    "max_runs": os.getenv("MUTECT2_MAX_RUNS"),
+    "max_runs_per_dir": os.getenv("MUTECT2_MAX_RUNS_PER_DIR"),
+    "cpus": os.getenv("MUTECT2_CPUS"),
+    "mem": os.getenv("MUTECT2_MEM"),
+    "bqsr": False
+})
+
+mutect2_bqsr_workflow = SangerWXSWorkflow({
+    "sheet_id": os.getenv("MUTECT2_BQSR_SHEET_ID"),
+    "sheet_range": os.getenv("MUTECT2_BQSR_SHEET_RANGE"),
+    "wf_url": os.getenv("MUTECT2_BQSR_WF_URL"),
+    "wf_version": os.getenv("MUTECT2_BQSR_WF_VERSION"),
+    "max_runs": os.getenv("MUTECT2_BQSR_MAX_RUNS"),
+    "max_runs_per_dir": os.getenv("MUTECT2_BQSR_MAX_RUNS_PER_DIR="),
+    "cpus": os.getenv("MUTECT2_BQSR_CPUS"),
+    "mem": os.getenv("MUTECT2_BQSR_MEM"),
+    "bqsr": True
+})
+
 runOrUpdateAlignWGS = Utils.methodOrUpdateFactory(align_wgs_workflow, "run", circuit_breaker)
 runOrUpdateAlignWXS = Utils.methodOrUpdateFactory(align_wxs_workflow, "run", circuit_breaker)
 runOrUpdateSangerWGS = Utils.methodOrUpdateFactory(sanger_wgs_workflow, "run", circuit_breaker)
 runOrUpdateSangerWXS = Utils.methodOrUpdateFactory(sanger_wxs_workflow, "run", circuit_breaker)
+runOrUpdateMutect2 = Utils.methodOrUpdateFactory(mutect2_workflow, "run", circuit_breaker)
+runOrUpdateMutect2BQSR = Utils.methodOrUpdateFactory(mutect2_bqsr_workflow, "run", circuit_breaker)
 
-getMergeRunCounts = Utils.mergeRunCountsFuncGen(align_wgs_workflow, align_wxs_workflow, sanger_wgs_workflow, sanger_wxs_workflow)
-getMergeWorkDirsInUse = Utils.mergeWorkDirsInUseFuncGen(align_wgs_workflow, align_wxs_workflow, sanger_wgs_workflow, sanger_wxs_workflow)
+getMergeRunCounts = Utils.mergeRunCountsFuncGen(align_wgs_workflow, align_wxs_workflow, sanger_wgs_workflow,
+                                                sanger_wxs_workflow, mutect2_workflow, mutect2_bqsr_workflow)
+getMergeWorkDirsInUse = Utils.mergeWorkDirsInUseFuncGen(align_wgs_workflow, align_wxs_workflow,
+                                                        sanger_wgs_workflow, sanger_wxs_workflow, mutect2_workflow, mutect2_bqsr_workflow)
 
 
 def onWorkflowMessageFunc(message):
@@ -84,7 +112,11 @@ def onWorkflowMessageFunc(message):
         runOrUpdateSangerWGS(quick=False, global_run_count=getMergeRunCounts(sanger_wgs_workflow),
                              global_work_dirs_in_use=getMergeWorkDirsInUse(sanger_wgs_workflow))
         runOrUpdateSangerWXS(quick=False, global_run_count=getMergeRunCounts(sanger_wxs_workflow),
-                             global_work_dirs_in_use=getMergeWorkDirsInUse(sanger_wxs_workflow))
+                             global_work_dirs_in_use=getMergeWorkDirsInUse(sanger_wxs_workflow)),
+        runOrUpdateMutect2(quick=False, global_run_count=getMergeRunCounts(mutect2_workflow),
+                           global_work_dirs_in_use=getMergeWorkDirsInUse(mutect2_workflow)),
+        runOrUpdateMutect2BQSR(quick=False, global_run_count=getMergeRunCounts(mutect2_bqsr_workflow),
+                               global_work_dirs_in_use=getMergeWorkDirsInUse(mutect2_bqsr_workflow))
     else:
         print("Workflow event does not pass filter!")
 
@@ -103,6 +135,10 @@ if __name__ == '__main__':
                          global_work_dirs_in_use=getMergeWorkDirsInUse(sanger_wgs_workflow))
     runOrUpdateSangerWXS(quick=True, global_run_count=getMergeRunCounts(sanger_wxs_workflow),
                          global_work_dirs_in_use=getMergeWorkDirsInUse(sanger_wxs_workflow))
+    runOrUpdateMutect2(quick=True, global_run_count=getMergeRunCounts(mutect2_workflow),
+                         global_work_dirs_in_use=getMergeWorkDirsInUse(mutect2_workflow))
+    runOrUpdateMutect2BQSR(quick=True, global_run_count=getMergeRunCounts(mutect2_bqsr_workflow),
+                         global_work_dirs_in_use=getMergeWorkDirsInUse(mutect2_bqsr_workflow))
 
     # subscribe to workflow events and run
     print("Waiting for workflow events ...")
