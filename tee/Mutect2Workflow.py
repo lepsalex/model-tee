@@ -7,6 +7,7 @@ class Mutect2Workflow(VariantCallerWorkflowBase):
 
     def __init__(self, config):
         super().__init__(config)
+        self.bqsr = config["bqsr"]
 
     def buildRunRequests(self, run, resume=False):
         config = {
@@ -17,9 +18,10 @@ class Mutect2Workflow(VariantCallerWorkflowBase):
             "revision": self.wf_version,
             "cpus": int(self.cpus),
             "mem": int(self.mem),
+            "bqsr": self.bqsr
         }
 
         if resume:
             config["resume"] = run["session_id"]
 
-        return Mutect2Workflow(self.wf_url, config)
+        return Mutect2Request(self.wf_url, config)
