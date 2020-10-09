@@ -23,8 +23,11 @@ class VariantCallerWorkflowBase(WorkflowBase):
         }
 
     def mergeRunsWithSheetData(self, runs):
+        # temp hack to run based on BSQR
+        filtered_runs = self.filterForBQSR(runs)
+
         # group by normal_aln_analysis_id and tumour_aln_analysis_id, then take the first value (already sorted)
-        latest_runs = runs.groupby(["normal_aln_analysis_id", "tumour_aln_analysis_id"]).head(1)
+        latest_runs = filtered_runs.groupby(["normal_aln_analysis_id", "tumour_aln_analysis_id"]).head(1)
 
         # Update sheet data
         new_sheet_data = pd.merge(self.sheet_data, latest_runs[["normal_aln_analysis_id", "tumour_aln_analysis_id", "work_dir", "run_id", "session_id", "state", "start", "end", "duration"]], on=[
@@ -54,6 +57,20 @@ class VariantCallerWorkflowBase(WorkflowBase):
             "duration_x",
             "duration_y",
         ], axis=1)
+
+    def filterForBQSR(self, runs):
+        if (hasattr(self, "bqsr")):
+            filtered_runs = runs.apply(self.bqsrApplyFilter, axis=1, result_type="broadcast")
+            filtered_runs = filtered_runs.dropna(how="all")
+            return filtered_runs
+        else:
+            return runs
+
+    def bqsrApplyFilter(self, row):
+        if row["params"]["perform_bqsr"] == self.bqsr:
+            return row
+        else:
+            return None
 
     def transformEventData(self, event_data):
         # Not currently needed

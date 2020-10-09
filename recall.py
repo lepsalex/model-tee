@@ -93,8 +93,8 @@ recall_list = []
 # sanger_wxs_workflow.update()
 # sanger_wxs_workflow.recall(recall_list)
 
-mutect2_workflow.update()
+# mutect2_workflow.update()
 # mutect2_workflow.recall(recall_list)
 
-mutect2_bqsr_workflow.update()
+# mutect2_bqsr_workflow.update()
 # mutect2_bqsr_workflow.recall(recall_list)
