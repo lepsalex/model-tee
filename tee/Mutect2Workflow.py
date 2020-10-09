@@ -24,4 +24,4 @@ class Mutect2Workflow(VariantCallerWorkflowBase):
         if resume:
             config["resume"] = run["session_id"]
 
-        return Mutect2Workflow(self.wf_url, config)
+        return Mutect2Request(self.wf_url, config)

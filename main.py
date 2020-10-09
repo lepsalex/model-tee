@@ -63,7 +63,7 @@ sanger_wxs_workflow = SangerWXSWorkflow({
     "mem": os.getenv("SANGER_WXS_MEM")
 })
 
-mutect2_workflow = SangerWXSWorkflow({
+mutect2_workflow = Mutect2Workflow({
     "sheet_id": os.getenv("MUTECT2_SHEET_ID"),
     "sheet_range": os.getenv("MUTECT2_SHEET_RANGE"),
     "wf_url": os.getenv("MUTECT2_WF_URL"),
@@ -75,13 +75,13 @@ mutect2_workflow = SangerWXSWorkflow({
     "bqsr": False
 })
 
-mutect2_bqsr_workflow = SangerWXSWorkflow({
+mutect2_bqsr_workflow = Mutect2Workflow({
     "sheet_id": os.getenv("MUTECT2_BQSR_SHEET_ID"),
     "sheet_range": os.getenv("MUTECT2_BQSR_SHEET_RANGE"),
     "wf_url": os.getenv("MUTECT2_BQSR_WF_URL"),
     "wf_version": os.getenv("MUTECT2_BQSR_WF_VERSION"),
     "max_runs": os.getenv("MUTECT2_BQSR_MAX_RUNS"),
-    "max_runs_per_dir": os.getenv("MUTECT2_BQSR_MAX_RUNS_PER_DIR="),
+    "max_runs_per_dir": os.getenv("MUTECT2_BQSR_MAX_RUNS_PER_DIR"),
     "cpus": os.getenv("MUTECT2_BQSR_CPUS"),
     "mem": os.getenv("MUTECT2_BQSR_MEM"),
     "bqsr": True
@@ -107,14 +107,19 @@ def onWorkflowMessageFunc(message):
         print("Workflow event valid, starting configured processes ...")
         runOrUpdateAlignWGS(quick=False, global_run_count=getMergeRunCounts(align_wgs_workflow),
                             global_work_dirs_in_use=getMergeWorkDirsInUse(align_wgs_workflow))
+
         runOrUpdateAlignWXS(quick=False, global_run_count=getMergeRunCounts(align_wxs_workflow),
                             global_work_dirs_in_use=getMergeWorkDirsInUse(align_wxs_workflow))
+
         runOrUpdateSangerWGS(quick=False, global_run_count=getMergeRunCounts(sanger_wgs_workflow),
                              global_work_dirs_in_use=getMergeWorkDirsInUse(sanger_wgs_workflow))
+
         runOrUpdateSangerWXS(quick=False, global_run_count=getMergeRunCounts(sanger_wxs_workflow),
-                             global_work_dirs_in_use=getMergeWorkDirsInUse(sanger_wxs_workflow)),
+                             global_work_dirs_in_use=getMergeWorkDirsInUse(sanger_wxs_workflow))
+
         runOrUpdateMutect2(quick=False, global_run_count=getMergeRunCounts(mutect2_workflow),
-                           global_work_dirs_in_use=getMergeWorkDirsInUse(mutect2_workflow)),
+                           global_work_dirs_in_use=getMergeWorkDirsInUse(mutect2_workflow))
+
         runOrUpdateMutect2BQSR(quick=False, global_run_count=getMergeRunCounts(mutect2_bqsr_workflow),
                                global_work_dirs_in_use=getMergeWorkDirsInUse(mutect2_bqsr_workflow))
     else:
@@ -129,16 +134,21 @@ if __name__ == '__main__':
     # run on start (if we are not in circuit breaker blown state)
     runOrUpdateAlignWGS(quick=True, global_run_count=getMergeRunCounts(align_wgs_workflow),
                         global_work_dirs_in_use=getMergeWorkDirsInUse(align_wgs_workflow))
+
     runOrUpdateAlignWXS(quick=True, global_run_count=getMergeRunCounts(align_wxs_workflow),
                         global_work_dirs_in_use=getMergeWorkDirsInUse(align_wxs_workflow))
+
     runOrUpdateSangerWGS(quick=True, global_run_count=getMergeRunCounts(sanger_wgs_workflow),
                          global_work_dirs_in_use=getMergeWorkDirsInUse(sanger_wgs_workflow))
+
     runOrUpdateSangerWXS(quick=True, global_run_count=getMergeRunCounts(sanger_wxs_workflow),
                          global_work_dirs_in_use=getMergeWorkDirsInUse(sanger_wxs_workflow))
+
     runOrUpdateMutect2(quick=True, global_run_count=getMergeRunCounts(mutect2_workflow),
-                         global_work_dirs_in_use=getMergeWorkDirsInUse(mutect2_workflow))
+                       global_work_dirs_in_use=getMergeWorkDirsInUse(mutect2_workflow))
+                       
     runOrUpdateMutect2BQSR(quick=True, global_run_count=getMergeRunCounts(mutect2_bqsr_workflow),
-                         global_work_dirs_in_use=getMergeWorkDirsInUse(mutect2_bqsr_workflow))
+                           global_work_dirs_in_use=getMergeWorkDirsInUse(mutect2_bqsr_workflow))
 
     # subscribe to workflow events and run
     print("Waiting for workflow events ...")
