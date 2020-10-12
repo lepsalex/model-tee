@@ -22,7 +22,7 @@ class Utils():
                 method_to_call(**kwargs)
             else:
                 print("Fuse Blown!")
-                print("Error count: ".format(cb.error_count))
+                print("Error count: {}".format(cb.error_count))
                 wf.update()
         return func
 
