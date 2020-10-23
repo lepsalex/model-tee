@@ -19,7 +19,7 @@ from service.Wes import Wes
 class WorkflowBase(ABC):
 
     NOT_SCHEDULABLE = ["QUEUED", "INITIALIZING", "RUNNING", "CANCELING"]
-    ALREADY_RAN = ["COMPLETE", "SYSTEM_ERROR", "EXECUTOR_ERROR", "UNKNOWN"]
+    ALREADY_RAN = ["COMPLETE", "SYSTEM_ERROR", "EXECUTOR_ERROR", "FAILED", "UNKNOWN"]
 
     # 16 work dirs in total following this format
     WORK_DIRS = {"nfs-{}-c{}".format(x, y) for x in range(1, 5) for y in range(1, 5)}
