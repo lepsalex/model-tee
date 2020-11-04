@@ -168,6 +168,24 @@ class WorkflowBase(ABC):
         print("Writing sheet data to Google Sheets ...")
         self.sheet.write(self.sheet_range, sheet_data)
 
+    def rerun(self, run_ids):
+        # get latest run info for sheet data
+        sheet_data = self.__updateSheetWithWesData()
+
+        reruns = sheet_data.loc[sheet_data["run_id"].isin(run_ids)]
+
+        requests = [self.buildRunRequests(rerun[1], False) for rerun in reruns.iterrows()]
+
+        Wes.startWesRuns(requests)
+
+        # Update again (after 30 second delay)
+        self.__printSleepForN(30)
+        sheet_data = self.__updateSheetWithWesData()
+
+        # Write sheet
+        print("Writing sheet data to Google Sheets ...")
+        self.sheet.write(self.sheet_range, sheet_data)
+
     def appendAndRun(self, data, quick=False, global_run_count=0, global_work_dirs_in_use=Counter()):
         # Print logogram if not in quick mode
         if not quick:

@@ -81,11 +81,16 @@ mutect2_bqsr_workflow = Mutect2Workflow({
 # Recall Script (to be run locally only!)
 recall_list = []
 
+# Rerun Script (to be run locally only!)
+rerun_list = []
+
 # align_wgs_workflow.update()
 # align_wgs_workflow.recall(recall_list)
+# align_wgs_workflow.rerun(rerun_list)
 
 # align_wxs_workflow.update()
 # align_wxs_workflow.recall(recall_list)
+# align_wxs_workflow.rerun(rerun_list)
 
 # sanger_wgs_workflow.update()
 # sanger_wgs_workflow.recall(recall_list)
