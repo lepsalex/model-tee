@@ -7,6 +7,12 @@ from gql import Client
 from gql.transport.requests import RequestsHTTPTransport
 from dotenv import load_dotenv
 
+# import logging
+# import sys
+# log = logging.getLogger('aiohttp')
+# log.addHandler(logging.StreamHandler(sys.stdout))
+# log.setLevel(logging.DEBUG)
+
 load_dotenv()
 
 
@@ -64,9 +70,3 @@ class Wes:
                     print("New run started with runId: ", data["run_id"])
                     # return format for easy write into sheets as column
                     return [data["run_id"]]
-
-    @staticmethod
-    def _getAuthHeader():
-        return {
-            'Authorization': 'Bearer ' + Ego.getToken()
-        }
