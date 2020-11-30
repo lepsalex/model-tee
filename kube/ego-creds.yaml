@@ -4,5 +4,5 @@ metadata:
   name: model-tee-ego
 type: Opaque
 data:
-  client_id: bW9kZWwtdGVlCg== # model-tee (default)
-  client_secret: bW9kZWwtdGVlLXNlY3JldAo= # model-tee-secret (default)
+  client_id: bW9kZWwtdGVl # model-tee (default)
+  client_secret: bW9kZWwtdGVlLXNlY3JldA== # model-tee-secret (default)
