@@ -25,13 +25,15 @@ spec:
         runAsUser: 9999
       containers:
         - name: model-tee
-          image: lepsalex/model-tee:3.6.2
+          image: lepsalex/model-tee:4.0.0-SNAPSHOT
           imagePullPolicy: Always
           volumeMounts:
             - name: model-tee-app
               mountPath: /usr/src/app/static
-            - name: model-tee-app-secret
+            - name: model-tee-google-secret
               mountPath: /usr/src/app/secret
+            - name: model-tee-ego-client-credentials
+              mountPath: /usr/src/app/ego
           env:
             - name: PYTHONUNBUFFERED
               value: "1"
@@ -41,9 +43,12 @@ spec:
             - configMapRef:
                 name: model-tee-env-file
       volumes:
-        - name: model-tee-app-secret
+        - name: model-tee-google-secret
           secret:
             secretName: model-tee-google-key
+        - name: model-tee-ego-client-credentials
+          secret:
+            secretName: model-tee-ego
   volumeClaimTemplates:
     - metadata:
         name: model-tee-app

@@ -1,4 +1,6 @@
 # User
+ego_client_id.txt
+ego_client_secret.txt
 credentials.json
 token.pickle
 api_token
