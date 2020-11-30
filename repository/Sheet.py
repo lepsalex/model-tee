@@ -13,7 +13,7 @@ class Sheet:
         self.STORAGE_ROOT = os.getenv("STORAGE_ROOT", './static')
 
         # Create credentials.json file
-        creds_fp = self.createCredentialsFile("{}/credentials.json".format(self.STORAGE_ROOT))
+        creds_fp = self._createCredentialsFile("{}/credentials.json".format(self.STORAGE_ROOT))
 
         # build creds from service account json (generated above)
         creds = service_account.Credentials.from_service_account_file(creds_fp, scopes=self.SCOPES)
@@ -77,7 +77,7 @@ class Sheet:
             df = pd.concat(data, axis=1)
             return df
 
-    def createCredentialsFile(self, path):
+    def _createCredentialsFile(self, path):
         with open(path, "w") as fp:
             creds = {
                 "type": "service_account",
