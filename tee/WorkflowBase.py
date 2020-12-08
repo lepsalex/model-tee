@@ -26,8 +26,8 @@ class WorkflowBase(ABC):
     NOT_SCHEDULABLE = ["QUEUED", "INITIALIZING", "RUNNING", "CANCELING"]
     ALREADY_RAN = ["COMPLETE", "SYSTEM_ERROR", "EXECUTOR_ERROR", "FAILED", "UNKNOWN"]
 
-    WORK_DIRS_DEV = set("nfs-dev-1-vol-dev-1", "nfs-dev-1-vol-dev-2")
-    WORK_DIRS_QA = set("nfs-dev-1-vol-qa-1")
+    WORK_DIRS_DEV = set(["nfs-dev-1-vol-dev-1", "nfs-dev-1-vol-dev-2"])
+    WORK_DIRS_QA = set(["nfs-dev-1-vol-qa-1"])
 
     # 16 work dirs in total following this format
     WORK_DIRS_PROD = {"nfs-{}-c{}".format(x, y) for x in range(1, 5) for y in range(1, 5)}
