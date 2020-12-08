@@ -14,15 +14,25 @@ from abc import ABC, abstractmethod
 from gql import gql
 from repository.Sheet import Sheet
 from service.Wes import Wes
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class WorkflowBase(ABC):
 
+    WORK_DIR_ENV = os.getenv("WORK_DIR_ENV", "Prod")
+
     NOT_SCHEDULABLE = ["QUEUED", "INITIALIZING", "RUNNING", "CANCELING"]
     ALREADY_RAN = ["COMPLETE", "SYSTEM_ERROR", "EXECUTOR_ERROR", "FAILED", "UNKNOWN"]
 
+    WORK_DIRS_DEV = set("nfs-dev-1-vol-dev-1", "nfs-dev-1-vol-dev-2")
+    WORK_DIRS_QA = set("nfs-dev-1-vol-qa-1")
+
     # 16 work dirs in total following this format
-    WORK_DIRS = {"nfs-{}-c{}".format(x, y) for x in range(1, 5) for y in range(1, 5)}
+    WORK_DIRS_PROD = {"nfs-{}-c{}".format(x, y) for x in range(1, 5) for y in range(1, 5)}
+
+    WORK_DIRS = WORK_DIRS_DEV if WORK_DIR_ENV == "Dev" else WORK_DIRS_QA if WORK_DIR_ENV == "QA" else WORK_DIRS_PROD
 
     def __init__(self, config):
         # minimum required attributes
