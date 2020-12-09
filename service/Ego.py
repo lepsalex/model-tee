@@ -8,6 +8,9 @@ from dotenv import load_dotenv
 # log = logging.getLogger('oauthlib')
 # log.addHandler(logging.StreamHandler(sys.stdout))
 # log.setLevel(logging.DEBUG)
+# log_req = logging.getLogger('requests_oauthlib')
+# log_req.addHandler(logging.StreamHandler(sys.stdout))
+# log_req.setLevel(logging.DEBUG)
 
 load_dotenv()
 
