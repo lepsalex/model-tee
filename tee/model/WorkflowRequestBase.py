@@ -7,9 +7,9 @@ class WorkflowRequestBase(ABC):
         self.song_score_config = {
             "SONG_URL": os.getenv("SONG_URL"),
             "SCORE_URL": os.getenv("SCORE_URL"),
-            "INTERMEDIATE_SONG_URL": os.getenv("INTERMEDIATE_SONG_URL"),
-            "ICGC_SCORE_URL": os.getenv("ICGC_SCORE_URL"),
-            "ICGC_SCORE_TOKEN": os.getenv("ICGC_SCORE_API_TOKEN")
+            "DOWNLOAD_SONG_URL": os.getenv("DOWNLOAD_SONG_URL"),
+            "DOWNLOAD_SCORE_URL": os.getenv("DOWNLOAD_SCORE_URL"),
+            "DOWNLOAD_SCORE_TOKEN": os.getenv("DOWNLOAD_SCORE_TOKEN")
         }
 
         self.workflow_url = workflow_url

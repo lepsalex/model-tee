@@ -73,10 +73,14 @@ class AlignRequest(WorkflowRequestBase):
             "cleanup": True
         }
 
-        if song_score_config.get("INTERMEDIATE_SONG_URL"):
-            params["download"]["song_url"] = song_score_config["INTERMEDIATE_SONG_URL"]
-            params["download"]["score_url"] = song_score_config["ICGC_SCORE_URL"]
-            params["download"]["score_api_token"] = song_score_config["ICGC_SCORE_TOKEN"]
+        if song_score_config.get("DOWNLOAD_SONG_URL"):
+            params["download"]["song_url"] = song_score_config["DOWNLOAD_SONG_URL"]
+
+        if song_score_config.get("DOWNLOAD_SCORE_URL"):
+            params["download"]["score_url"] = song_score_config["DOWNLOAD_SCORE_URL"]
+
+        if song_score_config.get("DOWNLOAD_SCORE_TOKEN"):
+            params["download"]["score_api_token"] = song_score_config["DOWNLOAD_SCORE_TOKEN"]
 
         return params
 
