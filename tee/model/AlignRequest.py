@@ -70,6 +70,7 @@ class AlignRequest(WorkflowRequestBase):
                 "score_cpus": 2,
                 "score_mem": 4
             },
+            "tempdir": "/icgc-argo-scratch",
             "cleanup": True
         }
 
