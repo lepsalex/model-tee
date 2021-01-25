@@ -258,16 +258,18 @@ class WorkflowBase(ABC):
         return gql('''
         {
             runs(page: {from: 0, size: 10000}, filter: {repository:\"%s\"} ) {
-                runId
-                sessionId
-                state
-                parameters
-                engineParameters {
-                    workDir
+                content {
+                    runId
+                    sessionId
+                    state
+                    parameters
+                    engineParameters {
+                        workDir
+                    }
+                    startTime
+                    completeTime
+                    duration
                 }
-                startTime
-                completeTime
-                duration
             }
         }
         ''' % self.wf_url)

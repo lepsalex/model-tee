@@ -32,9 +32,11 @@ class CircuitBreaker:
         query = gql('''
         {
             runs(page: {from: 0, size: 10}, filter: {state: "EXECUTOR_ERROR"}) {
-                runId
-                state
-                completeTime
+                content {
+                    runId
+                    state
+                    completeTime
+                }
             }
         }
         ''')
