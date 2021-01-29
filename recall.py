@@ -66,18 +66,6 @@ mutect2_workflow = Mutect2Workflow({
     "bqsr": False
 })
 
-mutect2_bqsr_workflow = Mutect2Workflow({
-    "sheet_id": os.getenv("MUTECT2_BQSR_SHEET_ID"),
-    "sheet_range": os.getenv("MUTECT2_BQSR_SHEET_RANGE"),
-    "wf_url": os.getenv("MUTECT2_BQSR_WF_URL"),
-    "wf_version": os.getenv("MUTECT2_BQSR_WF_VERSION"),
-    "max_runs": -1,
-    "max_runs_per_dir": -1,
-    "cpus": os.getenv("MUTECT2_BQSR_CPUS"),
-    "mem": os.getenv("MUTECT2_BQSR_MEM"),
-    "bqsr": True
-})
-
 # Recall Script (to be run locally only!)
 recall_list = []
 
@@ -100,6 +88,3 @@ rerun_list = []
 
 # mutect2_workflow.update()
 # mutect2_workflow.recall(recall_list)
-
-# mutect2_bqsr_workflow.update()
-# mutect2_bqsr_workflow.recall(recall_list)
