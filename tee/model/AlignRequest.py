@@ -71,7 +71,9 @@ class AlignRequest(WorkflowRequestBase):
                 "score_mem": 4
             },
             "tempdir": "/icgc-argo-scratch",
-            "cleanup": True
+            "cleanup": True,
+            "max_retries": 5,
+            "first_retry_wait_time": 60
         }
 
         if song_score_config.get("DOWNLOAD_SONG_URL"):

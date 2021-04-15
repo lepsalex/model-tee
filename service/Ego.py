@@ -17,8 +17,8 @@ load_dotenv()
 
 class Ego:
     _ego_url = os.getenv("EGO_TOKEN_URL")
-    _client_id = open(os.getenv("EGO_CLIENT_ID_FILE")).read()
-    _client_secret = open(os.getenv("EGO_CLIENT_SECRET_FILE")).read()
+    _client_id = open(os.getenv("EGO_CLIENT_ID_FILE")).read().rstrip()
+    _client_secret = open(os.getenv("EGO_CLIENT_SECRET_FILE")).read().rstrip()
 
     _ego_client = BackendApplicationClient(client_id=_client_id)
 

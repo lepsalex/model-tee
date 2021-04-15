@@ -39,7 +39,9 @@ class Mutect2Request(WorkflowRequestBase):
                 "mem": 10
             },
             "perform_bqsr": bqsr,
-            "cleanup": True
+            "cleanup": True,
+            "max_retries": 5,
+            "first_retry_wait_time": 60
         }
 
     def __str__(self):
