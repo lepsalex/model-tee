@@ -69,7 +69,9 @@ class SangerWXSRequest(WorkflowRequestBase):
                 "score_cpus": 4,
                 "score_mem": 10
             },
-            "cleanup": True
+            "cleanup": True,
+            "max_retries": 5,
+            "first_retry_wait_time": 60
         }
 
     def __str__(self):
