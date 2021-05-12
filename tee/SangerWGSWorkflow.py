@@ -7,6 +7,7 @@ class SangerWGSWorkflow(VariantCallerWorkflowBase):
 
     def __init__(self, config):
         super().__init__(config)
+        self.pindel_cpus = config["pindel_cpus"]
 
     def buildRunRequests(self, run, resume=False):
         config = {
@@ -16,6 +17,7 @@ class SangerWGSWorkflow(VariantCallerWorkflowBase):
             "work_dir": run["work_dir"],
             "revision": self.wf_version,
             "cpus": int(self.cpus),
+            "pindel_cpus": int(self.pindel_cpus),
             "mem": int(self.mem),
         }
 
