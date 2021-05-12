@@ -40,6 +40,7 @@ sanger_wgs_workflow = SangerWGSWorkflow({
     "max_runs": -1,
     "max_runs_per_dir": -1,
     "cpus": os.getenv("SANGER_WGS_CPUS"),
+    "pindel_cpus": os.getenv("SANGER_WGS_PINDEL_CPUS"),
     "mem": os.getenv("SANGER_WGS_MEM")
 })
 
