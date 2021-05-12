@@ -11,6 +11,7 @@ class SangerWGSRequest(WorkflowRequestBase):
         tumour_aln_analysis_id = run_config["tumour_aln_analysis_id"]
         work_dir = run_config["work_dir"]
         cpus = run_config["cpus"]
+        pindel_cpus = run_config["pindel_cpus"]
         mem = run_config["mem"]
 
         return {
@@ -30,7 +31,7 @@ class SangerWGSRequest(WorkflowRequestBase):
             "sangerWgsVariantCaller": {
                 "cpus": cpus,
                 "mem": mem,
-                "pindelcpu": 3,
+                "pindelcpu": pindel_cpus,
                 "ref_genome_tar": "/{}/reference/sanger-variant-calling/core_ref_GRCh38_hla_decoy_ebv.tar.gz".format(work_dir),
                 "vagrent_annot": "/{}/reference/sanger-variant-calling/VAGrENT_ref_GRCh38_hla_decoy_ebv_ensembl_91.tar.gz".format(work_dir),
                 "ref_snv_indel_tar": "/{}/reference/sanger-variant-calling/SNV_INDEL_ref_GRCh38_hla_decoy_ebv-fragment.tar.gz".format(work_dir),
