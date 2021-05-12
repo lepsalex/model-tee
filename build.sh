@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION="4.4.0-SNAPSHOT"
+VERSION="4.4.0"
 
 docker build . -t lepsalex/model-tee:$VERSION -t lepsalex/model-tee:latest
 docker push lepsalex/model-tee:$VERSION
