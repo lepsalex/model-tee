@@ -9,7 +9,6 @@ class SangerWGSRequest(WorkflowRequestBase):
         study_id = run_config["study_id"]
         normal_aln_analysis_id = run_config["normal_aln_analysis_id"]
         tumour_aln_analysis_id = run_config["tumour_aln_analysis_id"]
-        work_dir = run_config["work_dir"]
         cpus = run_config["cpus"]
         pindel_cpus = run_config["pindel_cpus"]
         mem = run_config["mem"]
@@ -32,16 +31,16 @@ class SangerWGSRequest(WorkflowRequestBase):
                 "cpus": cpus,
                 "mem": mem,
                 "pindelcpu": pindel_cpus,
-                "ref_genome_tar": "/{}/reference/sanger-variant-calling/core_ref_GRCh38_hla_decoy_ebv.tar.gz".format(work_dir),
-                "vagrent_annot": "/{}/reference/sanger-variant-calling/VAGrENT_ref_GRCh38_hla_decoy_ebv_ensembl_91.tar.gz".format(work_dir),
-                "ref_snv_indel_tar": "/{}/reference/sanger-variant-calling/SNV_INDEL_ref_GRCh38_hla_decoy_ebv-fragment.tar.gz".format(work_dir),
-                "ref_cnv_sv_tar": "/{}/reference/sanger-variant-calling/CNV_SV_ref_GRCh38_hla_decoy_ebv_brass6+.tar.gz".format(work_dir),
-                "qcset_tar": "/{}/reference/sanger-variant-calling/qcGenotype_GRCh38_hla_decoy_ebv.tar.gz".format(work_dir)
+                "ref_genome_tar": "/<SCHEDULED_DIR>/reference/sanger-variant-calling/core_ref_GRCh38_hla_decoy_ebv.tar.gz",
+                "vagrent_annot": "/<SCHEDULED_DIR>/reference/sanger-variant-calling/VAGrENT_ref_GRCh38_hla_decoy_ebv_ensembl_91.tar.gz",
+                "ref_snv_indel_tar": "/<SCHEDULED_DIR>/reference/sanger-variant-calling/SNV_INDEL_ref_GRCh38_hla_decoy_ebv-fragment.tar.gz",
+                "ref_cnv_sv_tar": "/<SCHEDULED_DIR>/reference/sanger-variant-calling/CNV_SV_ref_GRCh38_hla_decoy_ebv_brass6+.tar.gz",
+                "qcset_tar": "/<SCHEDULED_DIR>/reference/sanger-variant-calling/qcGenotype_GRCh38_hla_decoy_ebv.tar.gz"
             },
             "generateBas": {
                 "cpus": 6,
                 "mem": 32,
-                "ref_genome_fa": "/{}/reference/GRCh38_hla_decoy_ebv/GRCh38_hla_decoy_ebv.fa".format(work_dir)
+                "ref_genome_fa": "/<SCHEDULED_DIR>/reference/GRCh38_hla_decoy_ebv/GRCh38_hla_decoy_ebv.fa"
             },
             "repackSangerResults": {
                 "cpus": 2,

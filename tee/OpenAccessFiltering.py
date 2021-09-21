@@ -1,9 +1,9 @@
 from tee.SingleWorkflowBase import SingleWorkflowBase
 from tee.WorkflowBase import WorkflowBase, WorkflowState
-from tee.model.AlignRequest import AlignRequest
+from tee.model.OpenAccessFilteringRequest import OpenAccessFilteringRequest
 
 
-class AlignWorkflow(SingleWorkflowBase):
+class OpenAccessFiltering(SingleWorkflowBase):
 
     def __init__(self, config):
         super().__init__(config)
@@ -22,4 +22,4 @@ class AlignWorkflow(SingleWorkflowBase):
         if resume:
             config["resume"] = run["session_id"]
 
-        return AlignRequest(self.wf_url, config)
+        return OpenAccessFilteringRequest(self.wf_url, config)
