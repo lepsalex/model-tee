@@ -1,9 +1,8 @@
 import pandas as pd
 from tee.WorkflowBase import WorkflowBase, WorkflowState
-from tee.model.AlignRequest import AlignRequest
 
 
-class SingleWorkflowBase(WorkflowBase):
+class SingleInputWorkflowBase(WorkflowBase):
 
     def __init__(self, config):
         super().__init__(config)

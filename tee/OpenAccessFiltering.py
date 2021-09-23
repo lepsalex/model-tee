@@ -1,9 +1,8 @@
-from tee.SingleWorkflowBase import SingleWorkflowBase
-from tee.WorkflowBase import WorkflowBase, WorkflowState
+from tee.SingleInputWorkflowBase import SingleInputWorkflowBase
 from tee.model.OpenAccessFilteringRequest import OpenAccessFilteringRequest
 
 
-class OpenAccessFiltering(SingleWorkflowBase):
+class OpenAccessFiltering(SingleInputWorkflowBase):
 
     def __init__(self, config):
         super().__init__(config)

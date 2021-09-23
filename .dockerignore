@@ -9,6 +9,7 @@ api_token
 score_api_token
 kube
 build.sh
+.python-version
 
 # Environments
 .env.*

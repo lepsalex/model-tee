@@ -1,9 +1,8 @@
-from tee.SingleWorkflowBase import SingleWorkflowBase
-from tee.WorkflowBase import WorkflowBase, WorkflowState
+from tee.SingleInputWorkflowBase import SingleInputWorkflowBase
 from tee.model.AlignRequest import AlignRequest
 
 
-class AlignWorkflow(SingleWorkflowBase):
+class AlignWorkflow(SingleInputWorkflowBase):
 
     def __init__(self, config):
         super().__init__(config)

@@ -9,6 +9,7 @@ static
 .vscode
 google_private_key.txt
 .env.*
+.python-version
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
