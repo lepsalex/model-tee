@@ -16,13 +16,23 @@ class OpenAccessFilteringRequest(WorkflowRequestBase):
             "analysis_id": analysis_id,
             "song_url": song_score_config["SONG_URL"],
             "score_url": song_score_config["SCORE_URL"],
-            "regions_file": "/<SCHEDULED_DIR>/reference/open-access-filter/open_access.gencode_v38.20210915.bed.gz",
+            "regions_file": "<SCHEDULED_DIR>/reference/open-access-filter/open_access.gencode_v38.20210915.bed.gz",
+            "download": {},
             "cpus": cpus,
             "mem": mem,
             "cleanup": True,
             "max_retries": 3,
             "first_retry_wait_time": 5
         }
+
+        if song_score_config.get("DOWNLOAD_SONG_URL"):
+            params["download"]["song_url"] = song_score_config["DOWNLOAD_SONG_URL"]
+
+        if song_score_config.get("DOWNLOAD_SCORE_URL"):
+            params["download"]["score_url"] = song_score_config["DOWNLOAD_SCORE_URL"]
+
+        if song_score_config.get("DOWNLOAD_SCORE_TOKEN"):
+            params["download"]["api_token"] = song_score_config["DOWNLOAD_SCORE_TOKEN"]
 
         return params
 

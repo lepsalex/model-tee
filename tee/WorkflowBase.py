@@ -24,7 +24,7 @@ class WorkflowBase(ABC):
     WORK_DIR_ENV = os.getenv("WORK_DIR_ENV", "Prod")
 
     NOT_SCHEDULABLE = ["QUEUED", "INITIALIZING", "RUNNING", "CANCELING"]
-    ALREADY_RAN = ["COMPLETE", "SYSTEM_ERROR", "EXECUTOR_ERROR", "FAILED", "UNKNOWN"]
+    ALREADY_RAN = ["COMPLETE", "EXECUTOR_ERROR", "FAILED", "UNKNOWN"]
 
     WORK_DIRS_DEV = set(["nfs-dev-1-vol-dev-1", "nfs-dev-1-vol-dev-2"])
     WORK_DIRS_QA = set(["nfs-dev-1-vol-qa-1"])
@@ -387,9 +387,11 @@ class WorkflowBase(ABC):
 class WorkflowState(Enum):
     RUNNING = 1
     COMPLETE = 2
-    EXECUTOR_ERROR = 3
-    FAILED = 4
-    NA = 5
+    QUEUED = 3
+    EXECUTOR_ERROR = 4
+    FAILED = 5
+    SYSTEM_ERROR = 6
+    NA = 7
 
     def __str__(self):
         return self.name

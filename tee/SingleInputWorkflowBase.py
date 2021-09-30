@@ -9,9 +9,11 @@ class SingleInputWorkflowBase(WorkflowBase):
         self.index_cols = ["analysis_id"]
 
     def transformRunData(self, data):
+        if not data.get('parameters'): return None
+
         return {
             "analysis_id": data["parameters"]["analysis_id"],
-            "work_dir": data["engineParameters"]["workDir"].split("/")[1],
+            "work_dir": data["engineParameters"]["workDir"],
             "run_id": data["runId"],
             "session_id": data["sessionId"],
             "state": data["state"],

@@ -1,6 +1,6 @@
 # User
-ego_client_id.txt
-ego_client_secret.txt
+ego_client_id*.txt
+ego_client_secret*.txt
 credentials.json
 token.pickle
 api_token
@@ -8,7 +8,7 @@ score_api_token
 static
 .vscode
 google_private_key.txt
-.env.*
+.env*
 .python-version
 
 # Byte-compiled / optimized / DLL files
