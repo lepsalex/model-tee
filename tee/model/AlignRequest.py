@@ -16,7 +16,7 @@ class AlignRequest(WorkflowRequestBase):
             "analysis_id": analysis_id,
             "song_url": song_score_config["SONG_URL"],
             "score_url": song_score_config["SCORE_URL"],
-            "ref_genome_fa": "/<SCHEDULED_DIR>/reference/GRCh38_hla_decoy_ebv/GRCh38_hla_decoy_ebv.fa",
+            "ref_genome_fa": "<SCHEDULED_DIR>/reference/GRCh38_hla_decoy_ebv/GRCh38_hla_decoy_ebv.fa",
             "cpus": 2,
             "mem": 4,
             "download": {

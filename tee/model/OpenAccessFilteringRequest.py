@@ -17,6 +17,7 @@ class OpenAccessFilteringRequest(WorkflowRequestBase):
             "song_url": song_score_config["SONG_URL"],
             "score_url": song_score_config["SCORE_URL"],
             "regions_file": "<SCHEDULED_DIR>/reference/open-access-filter/open_access.gencode_v38.20210915.bed.gz",
+            #"regions_file": "<SCHEDULED_DIR>/reference/open-access-variant-filtering/open_access.20210318.bed.gz",  #QA
             "download": {},
             "cpus": cpus,
             "mem": mem,
