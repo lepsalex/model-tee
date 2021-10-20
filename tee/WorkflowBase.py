@@ -24,7 +24,7 @@ class WorkflowBase(ABC):
     WORK_DIR_ENV = os.getenv("WORK_DIR_ENV", "Prod")
 
     NOT_SCHEDULABLE = ["QUEUED", "INITIALIZING", "RUNNING", "CANCELING"]
-    ALREADY_RAN = ["COMPLETE", "EXECUTOR_ERROR", "FAILED", "UNKNOWN"]
+    ALREADY_RAN = ["COMPLETE", "SYSTEM_ERROR", "EXECUTOR_ERROR", "FAILED", "UNKNOWN"]
 
     WORK_DIRS_DEV = set(["nfs-dev-1-vol-dev-1", "nfs-dev-1-vol-dev-2"])
     WORK_DIRS_QA = set(["nfs-dev-1-vol-qa-1"])
