@@ -39,7 +39,11 @@ class Wes:
             response = cls._client.execute(query)
 
             # convert gql response to something we can work with
-            runs = [transform_func(run) for run in response["runs"]["content"]]
+            runs = []
+            for run in response["runs"]["content"]:
+              res = transform_func(run)
+              if not res: continue
+              runs.append(res)
 
             # create new dataframe and set index
             runs_df = pd.DataFrame(runs)

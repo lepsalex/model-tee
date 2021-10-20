@@ -6,6 +6,7 @@ from tee.AlignWorkflow import AlignWorkflow
 from tee.SangerWGSWorkflow import SangerWGSWorkflow
 from tee.SangerWXSWorkflow import SangerWXSWorkflow
 from tee.Mutect2Workflow import Mutect2Workflow
+from tee.OpenAccessFiltering import OpenAccessFiltering
 from tee.Utils import Utils
 from dotenv import load_dotenv
 
@@ -76,18 +77,30 @@ mutect2_workflow = Mutect2Workflow({
     "bqsr": False
 })
 
+open_filter_workflow = OpenAccessFiltering({
+    "sheet_id": os.getenv("OPEN_FILTER_SHEET_ID"),
+    "sheet_range": os.getenv("OPEN_FILTER_SHEET_RANGE"),
+    "wf_url": os.getenv("OPEN_FILTER_WF_URL"),
+    "wf_version": os.getenv("OPEN_FILTER_WF_VERSION"),
+    "max_runs": os.getenv("OPEN_FILTER_MAX_RUNS"),
+    "max_runs_per_dir": os.getenv("OPEN_FILTER_MAX_RUNS_PER_DIR"),
+    "cpus": os.getenv("OPEN_FILTER_CPUS"),
+    "mem": os.getenv("OPEN_FILTER_MEM")
+})
+
 runOrUpdateAlignWGS = Utils.methodOrUpdateFactory(align_wgs_workflow, "run", circuit_breaker)
 runOrUpdateAlignWXS = Utils.methodOrUpdateFactory(align_wxs_workflow, "run", circuit_breaker)
 runOrUpdateSangerWGS = Utils.methodOrUpdateFactory(sanger_wgs_workflow, "run", circuit_breaker)
 runOrUpdateSangerWXS = Utils.methodOrUpdateFactory(sanger_wxs_workflow, "run", circuit_breaker)
 runOrUpdateMutect2 = Utils.methodOrUpdateFactory(mutect2_workflow, "run", circuit_breaker)
+runOrUpdateOpenFilter = Utils.methodOrUpdateFactory(open_filter_workflow, "run", circuit_breaker)
 
 # Global count disabled (for now)
 # getMergeRunCounts = Utils.mergeRunCountsFuncGen(align_wgs_workflow, align_wxs_workflow, sanger_wgs_workflow,
-#                                                 sanger_wxs_workflow, mutect2_workflow)
+#                                                 sanger_wxs_workflow, mutect2_workflow, open_filter_workflow)
 
 getMergeWorkDirsInUse = Utils.mergeWorkDirsInUseFuncGen(align_wgs_workflow, align_wxs_workflow,
-                                                        sanger_wgs_workflow, sanger_wxs_workflow, mutect2_workflow)
+                                                        sanger_wgs_workflow, sanger_wxs_workflow, mutect2_workflow, open_filter_workflow)
 
 
 def onWorkflowMessageFunc(message):
@@ -104,6 +117,8 @@ def onWorkflowMessageFunc(message):
         runOrUpdateSangerWXS(quick=False, global_work_dirs_in_use=getMergeWorkDirsInUse(sanger_wxs_workflow))
 
         runOrUpdateMutect2(quick=False, global_work_dirs_in_use=getMergeWorkDirsInUse(mutect2_workflow))
+
+        runOrUpdateOpenFilter(quick=False, global_work_dirs_in_use=getMergeWorkDirsInUse(open_filter_workflow))
     else:
         print("Workflow event does not pass filter!")
 
@@ -123,6 +138,8 @@ if __name__ == '__main__':
     runOrUpdateSangerWXS(quick=True, global_work_dirs_in_use=getMergeWorkDirsInUse(sanger_wxs_workflow))
 
     runOrUpdateMutect2(quick=True, global_work_dirs_in_use=getMergeWorkDirsInUse(mutect2_workflow))
+
+    runOrUpdateOpenFilter(quick=True, global_work_dirs_in_use=getMergeWorkDirsInUse(open_filter_workflow))
 
     # subscribe to workflow events and run
     print("Waiting for workflow events ...")

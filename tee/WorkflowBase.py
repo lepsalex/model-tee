@@ -387,9 +387,11 @@ class WorkflowBase(ABC):
 class WorkflowState(Enum):
     RUNNING = 1
     COMPLETE = 2
-    EXECUTOR_ERROR = 3
-    FAILED = 4
-    NA = 5
+    QUEUED = 3
+    EXECUTOR_ERROR = 4
+    FAILED = 5
+    SYSTEM_ERROR = 6
+    NA = 7
 
     def __str__(self):
         return self.name
