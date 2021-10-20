@@ -41,9 +41,9 @@ class WorkflowRequestBase(ABC):
 
         engine_params = {}
 
-        WorkflowRequestBase.addFormattedStringValueIfValue(engine_params, "launch_dir", "/%s/launch", run_config.get("work_dir", None))
-        WorkflowRequestBase.addFormattedStringValueIfValue(engine_params, "project_dir", "/%s/projects/%s/%s/", run_config.get("work_dir", None), workflow_name, run_config.get("revision", "master"))
-        WorkflowRequestBase.addFormattedStringValueIfValue(engine_params, "work_dir", "/%s/work", run_config.get("work_dir", None))
+        WorkflowRequestBase.addFormattedStringValueIfValue(engine_params, "launch_dir", "%s/launch", "<SCHEDULED_DIR>")
+        WorkflowRequestBase.addFormattedStringValueIfValue(engine_params, "project_dir", "%s/projects/%s/%s/", "<SCHEDULED_DIR>", workflow_name, run_config.get("revision", "master"))
+        WorkflowRequestBase.addFormattedStringValueIfValue(engine_params, "work_dir", "%s/work", "<SCHEDULED_DIR>")
 
         WorkflowRequestBase.addValueIfValue(engine_params, "revision", run_config.get("revision", "master"))
         WorkflowRequestBase.addValueIfValue(engine_params, "resume", run_config.get("resume", None))

@@ -8,7 +8,6 @@ class AlignRequest(WorkflowRequestBase):
     def buildWorkflowParams(self, run_config, song_score_config):
         study_id = run_config["study_id"]
         analysis_id = run_config["analysis_id"]
-        work_dir = run_config["work_dir"]
         cpus = run_config["cpus"]
         mem = max((cpus * 3) + 2, run_config["mem"])
 
@@ -17,7 +16,7 @@ class AlignRequest(WorkflowRequestBase):
             "analysis_id": analysis_id,
             "song_url": song_score_config["SONG_URL"],
             "score_url": song_score_config["SCORE_URL"],
-            "ref_genome_fa": "/{}/reference/GRCh38_hla_decoy_ebv/GRCh38_hla_decoy_ebv.fa".format(work_dir),
+            "ref_genome_fa": "<SCHEDULED_DIR>/reference/GRCh38_hla_decoy_ebv/GRCh38_hla_decoy_ebv.fa",
             "cpus": 2,
             "mem": 4,
             "download": {

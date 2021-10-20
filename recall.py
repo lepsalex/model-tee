@@ -3,6 +3,7 @@ from tee.AlignWorkflow import AlignWorkflow
 from tee.SangerWGSWorkflow import SangerWGSWorkflow
 from tee.SangerWXSWorkflow import SangerWXSWorkflow
 from tee.Mutect2Workflow import Mutect2Workflow
+from tee.OpenAccessFiltering import OpenAccessFiltering
 from dotenv import load_dotenv
 
 # load env from file if present
@@ -67,6 +68,18 @@ mutect2_workflow = Mutect2Workflow({
     "bqsr": False
 })
 
+open_filter_workflow = OpenAccessFiltering({
+    "sheet_id": os.getenv("OPEN_FILTER_SHEET_ID"),
+    "sheet_range": os.getenv("OPEN_FILTER_SHEET_RANGE"),
+    "wf_url": os.getenv("OPEN_FILTER_WF_URL"),
+    "wf_version": os.getenv("OPEN_FILTER_WF_VERSION"),
+    "max_runs": -1,
+    "max_runs_per_dir": -1,
+    "cpus": os.getenv("OPEN_FILTER_CPUS"),
+    "mem": os.getenv("OPEN_FILTER_MEM")
+})
+
+
 # Recall Script (to be run locally only!)
 recall_list = []
 
@@ -89,3 +102,7 @@ rerun_list = []
 
 # mutect2_workflow.update()
 # mutect2_workflow.recall(recall_list)
+
+#open_filter_workflow.update()
+#open_filter_workflow.recall(recall_list)
+#open_filter_workflow.rerun(rerun_list)
