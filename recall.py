@@ -103,6 +103,6 @@ rerun_list = []
 # mutect2_workflow.update()
 # mutect2_workflow.recall(recall_list)
 
-open_filter_workflow.update()
+#open_filter_workflow.update()
 #open_filter_workflow.recall(recall_list)
 #open_filter_workflow.rerun(rerun_list)
